@@ -1,0 +1,54 @@
+{
+  "labors": [
+    {
+      "id": "1cd74878-df30-4cfb-a208-967166f6f305",
+      "name": "Prashant Rajak",
+      "address": "Paroha 01, Rautahat",
+      "due": 50000,
+      "paymentHistory": []
+    },
+    {
+      "id": "8f47efd1-54b6-48bb-beb3-539a011c75bd",
+      "name": "Ramesh",
+      "address": "Kathmandu",
+      "due": 100000,
+      "paymentHistory": []
+    }
+  ],
+  "expenses": [
+    {
+      "id": "ffa12de8-d650-465f-a587-09468dd3cfe0",
+      "date": "2025-11-28T14:38:24.497Z",
+      "description": "Coal purchase",
+      "amount": 1000000,
+      "category": "Raw Material"
+    },
+    {
+      "id": "87a77f14-daab-44f9-8e06-6cb8ee9ce171",
+      "date": "2025-11-28T14:38:50.770Z",
+      "description": "wood purchase",
+      "amount": 35000,
+      "category": "Raw Material"
+    }
+  ],
+  "sales": [
+    {
+      "id": "2445701c-0450-4b5c-8482-1d2af0b2658d",
+      "date": "2025-11-28T14:39:26.348Z",
+      "vehicleNo": "BA 1 PA 1568",
+      "quantity": 2000,
+      "rate": 13,
+      "totalAmount": 26000,
+      "receivedAmount": 26000
+    },
+    {
+      "id": "6f0f05f2-5774-4cf8-8bb7-45bd13f99eeb",
+      "date": "2025-11-28T14:44:24.498Z",
+      "vehicleNo": "BA 1 PA 1566",
+      "quantity": 8000,
+      "rate": 13,
+      "totalAmount": 104000,
+      "receivedAmount": 240000
+    }
+  ]
+}
