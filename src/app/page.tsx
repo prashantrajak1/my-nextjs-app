@@ -116,7 +116,6 @@ import {
   IndianRupee,
   ShoppingCart,
   TrendingUp,
-  Factory,
 } from 'lucide-react';
 
 function formatCurrency(value: number | null | undefined) {
@@ -128,7 +127,9 @@ export default async function DashboardPage() {
   const [laborCount, expenseAgg, salesAgg] = await Promise.all([
     prisma.labor.count(),
     prisma.expense.aggregate({ _sum: { amount: true } }),
-    prisma.sale.aggregate({ _sum: { totalAmount: true, receivedAmount: true } }),
+    prisma.sale.aggregate({
+      _sum: { totalAmount: true, receivedAmount: true },
+    }),
   ]);
 
   const totalExpenses = expenseAgg._sum.amount ?? 0;
@@ -136,118 +137,97 @@ export default async function DashboardPage() {
   const totalReceived = salesAgg._sum.receivedAmount ?? 0;
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-50">
+    <div className="dashboard">
       <Navbar />
 
-      <main className="mx-auto max-w-6xl px-4 pb-10 pt-6 space-y-6">
-        {/* HEADER CARD */}
-        <section className="rounded-2xl border border-slate-700 bg-gradient-to-r from-slate-900 via-slate-900 to-slate-900 p-6 shadow-xl">
-          <div className="flex flex-col items-start gap-4 md:flex-row md:items-center md:justify-between">
-            <div className="flex items-center gap-4">
-              <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 text-slate-950 shadow-lg shadow-amber-500/40">
-                <Factory size={32} />
-              </div>
+      <main className="dashboard-inner">
+        {/* HEADER SECTION */}
+        <section className="dashboard-header-card">
+          <div className="dashboard-header-left">
+            <div className="dashboard-logo">S</div>
+            <div className="dashboard-title-block">
+              <h1>SANJAY ITTA UDHYOG</h1>
+              <p>Premium Brick Manufacturing &amp; Management System</p>
+            </div>
+          </div>
 
-              <div>
-                <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
-                  SANJAY ITTA UDHYOG
-                </h1>
-                <p className="mt-1 text-sm text-slate-300">
-                  Premium Brick Manufacturing &amp; Management System
-                </p>
+          <div className="dashboard-header-right">
+            <div className="dashboard-mini-card">
+              <div className="dashboard-mini-card-label">Active Labors</div>
+              <div className="dashboard-mini-card-value">
+                {laborCount}
               </div>
             </div>
-
-            <div className="mt-2 grid w-full max-w-xs grid-cols-2 gap-3 text-sm md:mt-0">
-              <div className="rounded-xl border border-slate-700 bg-slate-950/70 px-3 py-2 text-center">
-                <p className="text-[11px] uppercase tracking-wide text-slate-400">
-                  Active Labors
-                </p>
-                <p className="mt-1 text-xl font-bold text-amber-300">
-                  {laborCount}
-                </p>
-              </div>
-              <div className="rounded-xl border border-slate-700 bg-slate-950/70 px-3 py-2 text-center">
-                <p className="text-[11px] uppercase tracking-wide text-slate-400">
-                  Total Revenue
-                </p>
-                <p className="mt-1 text-xl font-bold text-emerald-300">
-                  {formatCurrency(totalReceived)}
-                </p>
+            <div className="dashboard-mini-card">
+              <div className="dashboard-mini-card-label">Total Revenue</div>
+              <div className="dashboard-mini-card-value">
+                {formatCurrency(totalReceived)}
               </div>
             </div>
           </div>
         </section>
 
-        {/* STATS GRID */}
-        <section className="grid gap-4 md:grid-cols-4">
+        {/* GRID OF SQUARE CARDS */}
+        <section className="dashboard-grid">
           {/* Total Labors */}
-          <div className="flex flex-col justify-between rounded-2xl border border-slate-700 bg-slate-900/90 p-4 shadow-md">
-            <div className="flex items-center justify-between">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-400/15 text-amber-300">
+          <div className="dashboard-card dashboard-card--labors">
+            <div className="dashboard-card-header">
+              <div className="dashboard-card-icon">
                 <Users size={22} />
               </div>
-              <span className="text-[11px] uppercase tracking-wide text-slate-400">
-                Workforce
-              </span>
+              <div className="dashboard-card-label">WORKFORCE</div>
             </div>
-            <div className="mt-4">
-              <p className="text-xs text-slate-400">Total Labors</p>
-              <p className="mt-1 text-2xl font-bold">{laborCount}</p>
+            <div>
+              <div className="dashboard-card-title">Total Labors</div>
+              <div className="dashboard-card-value">{laborCount}</div>
             </div>
           </div>
 
           {/* Total Expenses */}
-          <div className="flex flex-col justify-between rounded-2xl border border-slate-700 bg-slate-900/90 p-4 shadow-md">
-            <div className="flex items-center justify-between">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-red-500/15 text-red-300">
+          <div className="dashboard-card dashboard-card--expenses">
+            <div className="dashboard-card-header">
+              <div className="dashboard-card-icon">
                 <IndianRupee size={22} />
               </div>
-              <span className="text-[11px] uppercase tracking-wide text-slate-400">
-                Outflow
-              </span>
+              <div className="dashboard-card-label">OUTFLOW</div>
             </div>
-            <div className="mt-4">
-              <p className="text-xs text-slate-400">Total Expenses</p>
-              <p className="mt-1 text-2xl font-bold text-red-300">
+            <div>
+              <div className="dashboard-card-title">Total Expenses</div>
+              <div className="dashboard-card-value">
                 {formatCurrency(totalExpenses)}
-              </p>
+              </div>
             </div>
           </div>
 
           {/* Total Sales */}
-          <div className="flex flex-col justify-between rounded-2xl border border-slate-700 bg-slate-900/90 p-4 shadow-md">
-            <div className="flex items-center justify-between">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-sky-500/15 text-sky-300">
+          <div className="dashboard-card dashboard-card--sales">
+            <div className="dashboard-card-header">
+              <div className="dashboard-card-icon">
                 <ShoppingCart size={22} />
               </div>
-              <span className="text-[11px] uppercase tracking-wide text-slate-400">
-                Gross Sales
-              </span>
+              <div className="dashboard-card-label">GROSS SALES</div>
             </div>
-            <div className="mt-4">
-              <p className="text-xs text-slate-400">Total Sales Value</p>
-              <p className="mt-1 text-2xl font-bold text-sky-300">
+            <div>
+              <div className="dashboard-card-title">Total Sales Value</div>
+              <div className="dashboard-card-value">
                 {formatCurrency(totalSales)}
-              </p>
+              </div>
             </div>
           </div>
 
           {/* Total Received */}
-          <div className="flex flex-col justify-between rounded-2xl border border-slate-700 bg-slate-900/90 p-4 shadow-md">
-            <div className="flex items-center justify-between">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-500/15 text-emerald-300">
+          <div className="dashboard-card dashboard-card--received">
+            <div className="dashboard-card-header">
+              <div className="dashboard-card-icon">
                 <TrendingUp size={22} />
               </div>
-              <span className="text-[11px] uppercase tracking-wide text-slate-400">
-                Cash In
-              </span>
+              <div className="dashboard-card-label">CASH IN</div>
             </div>
-            <div className="mt-4">
-              <p className="text-xs text-slate-400">Total Received</p>
-              <p className="mt-1 text-2xl font-bold text-emerald-300">
+            <div>
+              <div className="dashboard-card-title">Total Received</div>
+              <div className="dashboard-card-value">
                 {formatCurrency(totalReceived)}
-              </p>
+              </div>
             </div>
           </div>
         </section>
@@ -255,5 +235,6 @@ export default async function DashboardPage() {
     </div>
   );
 }
+
 
 
