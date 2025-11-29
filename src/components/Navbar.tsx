@@ -26,7 +26,7 @@ export default function Navbar() {
         <nav className="glass-panel mb-8 p-4 flex justify-between items-center sticky top-4 z-50">
             <div className="flex items-center gap-2">
                 <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center font-bold text-white">
-                    S
+
                 </div>
                 <span className="font-bold text-lg hidden sm:block">Sanjay Itta Udhyog</span>
             </div>
