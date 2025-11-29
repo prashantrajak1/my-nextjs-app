@@ -116,6 +116,7 @@ import {
   IndianRupee,
   ShoppingCart,
   TrendingUp,
+  Package2,
 } from 'lucide-react';
 
 function formatCurrency(value: number | null | undefined) {
@@ -123,18 +124,49 @@ function formatCurrency(value: number | null | undefined) {
   return `₹${value.toLocaleString('en-IN')}`;
 }
 
+// You can edit this list to match the brick types you actually produce
+const KNOWN_BRICK_TYPES = ['Normal', 'Standard', 'Premium'];
+
 export default async function DashboardPage() {
-  const [laborCount, expenseAgg, salesAgg] = await Promise.all([
+  const [
+    laborCount,
+    expenseAgg,
+    salesAgg,
+    salesCount,
+    bricksByType,
+  ] = await Promise.all([
     prisma.labor.count(),
     prisma.expense.aggregate({ _sum: { amount: true } }),
     prisma.sale.aggregate({
-      _sum: { totalAmount: true, receivedAmount: true },
+      _sum: { totalAmount: true, receivedAmount: true, quantity: true },
+    }),
+    prisma.sale.count(),
+    prisma.sale.findMany({
+      where: { brickType: { not: null } },
+      select: { brickType: true },
     }),
   ]);
 
   const totalExpenses = expenseAgg._sum.amount ?? 0;
   const totalSales = salesAgg._sum.totalAmount ?? 0;
   const totalReceived = salesAgg._sum.receivedAmount ?? 0;
+
+  // Bricks-related numbers
+  const totalBricksSold = salesAgg._sum.quantity ?? 0;
+
+  const soldTypesSet = new Set(
+    bricksByType
+      .map((b) => b.brickType)
+      .filter((t): t is string => !!t && t.trim().length > 0)
+  );
+
+  const brickTypesSold = soldTypesSet.size;
+  const brickTypesRemaining = KNOWN_BRICK_TYPES.filter(
+    (t) => !soldTypesSet.has(t)
+  ).length;
+
+  const avgBricksPerSale =
+    salesCount > 0 ? Math.round(totalBricksSold / salesCount) : 0;
 
   return (
     <div className="dashboard">
@@ -167,7 +199,7 @@ export default async function DashboardPage() {
           </div>
         </section>
 
-        {/* GRID OF SQUARE CARDS */}
+        {/* GRID OF MAIN CARDS */}
         <section className="dashboard-grid">
           {/* Total Labors */}
           <div className="dashboard-card dashboard-card--labors">
@@ -231,10 +263,81 @@ export default async function DashboardPage() {
             </div>
           </div>
         </section>
+
+        {/* BRICKS COUNT SECTION */}
+        <section className="dashboard-bricks-card">
+          <div className="dashboard-bricks-header">
+            <div className="dashboard-bricks-title-block">
+              <h2>Bricks Count</h2>
+              <p>
+                Overview of total bricks sold and brick types performance.
+              </p>
+            </div>
+            <div className="dashboard-bricks-badge">
+              <Package2
+                size={14}
+                style={{ marginRight: 6, verticalAlign: 'text-bottom' }}
+              />
+              BRICKS SUMMARY
+            </div>
+          </div>
+
+          <div className="dashboard-bricks-stats">
+            <div className="dashboard-bricks-stat">
+              <div className="dashboard-bricks-stat-label">
+                TOTAL BRICKS SOLD
+              </div>
+              <div className="dashboard-bricks-stat-value">
+                {totalBricksSold.toLocaleString('en-IN')}
+              </div>
+              <div className="dashboard-bricks-stat-note">
+                Sum of quantities from all sales.
+              </div>
+            </div>
+
+            <div className="dashboard-bricks-stat">
+              <div className="dashboard-bricks-stat-label">
+                BRICK TYPES SOLD
+              </div>
+              <div className="dashboard-bricks-stat-value">
+                {brickTypesSold}
+              </div>
+              <div className="dashboard-bricks-stat-note">
+                Unique brick types recorded in sales.
+              </div>
+            </div>
+
+            <div className="dashboard-bricks-stat">
+              <div className="dashboard-bricks-stat-label">
+                BRICK TYPES REMAINING
+              </div>
+              <div className="dashboard-bricks-stat-value">
+                {brickTypesRemaining}
+              </div>
+              <div className="dashboard-bricks-stat-note">
+                Based on known types: {KNOWN_BRICK_TYPES.join(', ')}.
+                Edit this list in code if needed.
+              </div>
+            </div>
+
+            <div className="dashboard-bricks-stat">
+              <div className="dashboard-bricks-stat-label">
+                AVG BRICKS PER SALE
+              </div>
+              <div className="dashboard-bricks-stat-value">
+                {avgBricksPerSale.toLocaleString('en-IN')}
+              </div>
+              <div className="dashboard-bricks-stat-note">
+                Total bricks / number of sales records.
+              </div>
+            </div>
+          </div>
+        </section>
       </main>
     </div>
   );
 }
+
 
 
 
