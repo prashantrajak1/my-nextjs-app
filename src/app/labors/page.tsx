@@ -1,7 +1,7 @@
 import Navbar from '@/components/Navbar';
 import { prisma } from '@/lib/db';
-import { addLabor } from '@/app/actions';
-import { UserPlus, MapPin, DollarSign } from 'lucide-react';
+import { addLabor, deleteLabor } from '@/app/actions';
+import { UserPlus, MapPin, Trash2 } from 'lucide-react';
 import Link from 'next/link';
 
 export default async function LaborsPage() {
@@ -82,11 +82,19 @@ export default async function LaborsPage() {
                                             <td className="text-gray-300">{labor.daysWorked}</td>
                                             <td className="font-bold text-red-400">₹{labor.due.toLocaleString()}</td>
                                             <td>
-                                                <Link href={`/labors/${labor.id}`}>
-                                                    <button className="text-xs bg-primary/20 text-primary px-3 py-1 rounded hover:bg-primary/30 transition-colors">
-                                                        View Details
-                                                    </button>
-                                                </Link>
+                                                <div className="flex items-center gap-2">
+                                                    <Link href={`/labors/${labor.id}`}>
+                                                        <button className="text-xs bg-primary/20 text-primary px-3 py-1 rounded hover:bg-primary/30 transition-colors">
+                                                            View Details
+                                                        </button>
+                                                    </Link>
+                                                    <form action={deleteLabor}>
+                                                        <input type="hidden" name="id" value={labor.id} />
+                                                        <button type="submit" className="p-2 hover:bg-red-500/20 text-red-400 rounded-lg transition-colors">
+                                                            <Trash2 size={16} />
+                                                        </button>
+                                                    </form>
+                                                </div>
                                             </td>
                                         </tr>
                                     ))}

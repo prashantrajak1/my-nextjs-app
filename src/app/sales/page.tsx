@@ -1,7 +1,7 @@
 import Navbar from '@/components/Navbar';
 import { prisma } from '@/lib/db';
-import { addSale } from '@/app/actions';
-import { ShoppingCart, Calendar, Truck, FileText, Download } from 'lucide-react';
+import { addSale, deleteSale } from '@/app/actions';
+import { ShoppingCart, Calendar, Truck, FileText, Download, Trash2, Edit } from 'lucide-react';
 import { format } from 'date-fns';
 import Link from 'next/link';
 
@@ -42,6 +42,16 @@ export default async function SalesPage() {
                                 <label className="block text-sm font-medium text-gray-300 mb-1">Vehicle Number</label>
                                 <input name="vehicleNo" type="text" className="glass-input" placeholder="e.g., BA 1 PA 1234" required />
                             </div>
+
+                            <div>
+                                <label className="block text-sm font-medium text-gray-300 mb-1">Brick Type</label>
+                                <select name="brickType" className="glass-input bg-gray-800">
+                                    <option value="No.1">Brick No.1</option>
+                                    <option value="No.2">Brick No.2</option>
+                                    <option value="No.3">Brick No.3</option>
+                                </select>
+                            </div>
+
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
                                     <label className="block text-sm font-medium text-gray-300 mb-1">Quantity</label>
@@ -81,6 +91,7 @@ export default async function SalesPage() {
                                     <tr>
                                         <th>Date</th>
                                         <th>Vehicle No</th>
+                                        <th>Type</th>
                                         <th>Details</th>
                                         <th>Total</th>
                                         <th>Received</th>
@@ -103,6 +114,7 @@ export default async function SalesPage() {
                                                         {sale.vehicleNo}
                                                     </div>
                                                 </td>
+                                                <td className="text-sm text-gray-300">{sale.brickType}</td>
                                                 <td className="text-sm text-gray-300">
                                                     {sale.quantity} @ ₹{sale.rate}
                                                 </td>
@@ -129,11 +141,19 @@ export default async function SalesPage() {
                                                     )}
                                                 </td>
                                                 <td>
-                                                    <Link href={`/sales/${sale.id}/edit`}>
-                                                        <button className="text-xs bg-blue-500/20 text-blue-400 px-3 py-1 rounded hover:bg-blue-500/30 transition-colors">
-                                                            Edit
-                                                        </button>
-                                                    </Link>
+                                                    <div className="flex items-center gap-2">
+                                                        <Link href={`/sales/${sale.id}/edit`}>
+                                                            <button className="text-xs bg-blue-500/20 text-blue-400 px-3 py-1 rounded hover:bg-blue-500/30 transition-colors">
+                                                                <Edit size={14} />
+                                                            </button>
+                                                        </Link>
+                                                        <form action={deleteSale}>
+                                                            <input type="hidden" name="id" value={sale.id} />
+                                                            <button type="submit" className="text-xs bg-red-500/20 text-red-400 px-3 py-1 rounded hover:bg-red-500/30 transition-colors">
+                                                                <Trash2 size={14} />
+                                                            </button>
+                                                        </form>
+                                                    </div>
                                                 </td>
                                             </tr>
                                         );

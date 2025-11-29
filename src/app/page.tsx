@@ -1,87 +1,105 @@
 import Navbar from '@/components/Navbar';
 import { prisma } from '@/lib/db';
-import { Users, DollarSign, ShoppingCart, TrendingUp, Building2 } from 'lucide-react';
+import { Users, DollarSign, ShoppingCart, TrendingUp, Package } from 'lucide-react';
 
-async function getStats() {
+export default async function Dashboard() {
   const totalLabors = await prisma.labor.count();
 
-  const expenses = await prisma.expense.aggregate({
-    _sum: { amount: true }
-  });
-  const totalExpenses = expenses._sum.amount || 0;
+  const expenses = await prisma.expense.findMany();
+  const totalExpenses = expenses.reduce((sum, expense) => sum + expense.amount, 0);
 
-  const sales = await prisma.sale.aggregate({
-    _sum: { totalAmount: true, receivedAmount: true }
-  });
-  const totalSales = sales._sum.totalAmount || 0;
-  const totalReceived = sales._sum.receivedAmount || 0;
+  const sales = await prisma.sale.findMany();
+  const totalSales = sales.reduce((sum, sale) => sum + sale.totalAmount, 0);
+  const receivedAmount = sales.reduce((sum, sale) => sum + sale.receivedAmount, 0);
 
-  return { totalLabors, totalExpenses, totalSales, totalReceived };
-}
-
-export default async function Home() {
-  const stats = await getStats();
+  // Inventory Stats
+  const brickStocks = await prisma.brickStock.findMany();
+  const stockMap = brickStocks.reduce((acc, stock) => {
+    acc[stock.type] = stock.quantity;
+    return acc;
+  }, {} as Record<string, number>);
 
   return (
-    <div className="min-h-screen pb-10 bg-gradient-to-br from-gray-900 via-gray-800 to-black text-white">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black text-white">
       <Navbar />
 
       <main className="container mx-auto px-4 py-8">
-        {/* Hero Section with Bold Branding */}
-        <div className="text-center mb-16 animate-fade-in">
-          <div className="inline-block p-4 rounded-full bg-white/5 backdrop-blur-lg border border-white/10 mb-6 shadow-2xl">
-            <Building2 size={64} className="text-primary animate-pulse" />
-          </div>
-          <h1 className="text-6xl md:text-8xl font-black tracking-tighter mb-4">
-            <span className="bg-clip-text text-transparent bg-gradient-to-r from-orange-500 via-red-500 to-yellow-500 drop-shadow-lg">
+        {/* Hero Section */}
+        <div className="text-center mb-12 animate-fade-in">
+          <h1 className="text-5xl md:text-7xl font-extrabold mb-4 tracking-tight">
+            <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500">
               SANJAY ITTA UDHYOG
             </span>
           </h1>
-          <p className="text-xl text-gray-400 max-w-2xl mx-auto font-light">
+          <p className="text-xl text-gray-400 font-light tracking-wide">
             Premium Brick Manufacturing & Management System
           </p>
         </div>
 
-        {/* Stats Grid */}
+        {/* Inventory Stats */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12 animate-slide-up">
+          {['No.1', 'No.2', 'No.3'].map((type) => (
+            <div key={type} className="glass-card flex items-center justify-between p-6 border-l-4 border-blue-500">
+              <div>
+                <p className="text-gray-400 text-sm uppercase tracking-wider">Brick {type}</p>
+                <p className="text-3xl font-bold text-white mt-1">
+                  {(stockMap[type] || 0).toLocaleString()}
+                </p>
+              </div>
+              <div className="p-3 rounded-full bg-blue-500/20 text-blue-400">
+                <Package size={28} />
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Main Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <StatCard
-            title="Total Labors"
-            value={stats.totalLabors.toString()}
-            icon={<Users size={24} className="text-blue-400" />}
-            color="bg-blue-500/10 border-blue-500/20"
-          />
-          <StatCard
-            title="Total Expenses"
-            value={`₹${stats.totalExpenses.toLocaleString()}`}
-            icon={<DollarSign size={24} className="text-red-400" />}
-            color="bg-red-500/10 border-red-500/20"
-          />
-          <StatCard
-            title="Total Sales"
-            value={`₹${stats.totalSales.toLocaleString()}`}
-            icon={<ShoppingCart size={24} className="text-green-400" />}
-            color="bg-green-500/10 border-green-500/20"
-          />
-          <StatCard
-            title="Received Amount"
-            value={`₹${stats.totalReceived.toLocaleString()}`}
-            icon={<TrendingUp size={24} className="text-yellow-400" />}
-            color="bg-yellow-500/10 border-yellow-500/20"
-          />
+          <div className="glass-card hover:bg-white/5 transition-all duration-300 group">
+            <div className="flex items-center justify-between mb-4">
+              <div className="p-3 rounded-full bg-purple-500/20 text-purple-400 group-hover:scale-110 transition-transform">
+                <Users size={24} />
+              </div>
+              <span className="text-xs font-medium text-gray-500 bg-white/10 px-2 py-1 rounded-full">Active</span>
+            </div>
+            <h3 className="text-3xl font-bold text-white mb-1">{totalLabors}</h3>
+            <p className="text-sm text-gray-400">Total Labors</p>
+          </div>
+
+          <div className="glass-card hover:bg-white/5 transition-all duration-300 group">
+            <div className="flex items-center justify-between mb-4">
+              <div className="p-3 rounded-full bg-red-500/20 text-red-400 group-hover:scale-110 transition-transform">
+                <DollarSign size={24} />
+              </div>
+              <span className="text-xs font-medium text-gray-500 bg-white/10 px-2 py-1 rounded-full">Monthly</span>
+            </div>
+            <h3 className="text-3xl font-bold text-white mb-1">₹{totalExpenses.toLocaleString()}</h3>
+            <p className="text-sm text-gray-400">Total Expenses</p>
+          </div>
+
+          <div className="glass-card hover:bg-white/5 transition-all duration-300 group">
+            <div className="flex items-center justify-between mb-4">
+              <div className="p-3 rounded-full bg-green-500/20 text-green-400 group-hover:scale-110 transition-transform">
+                <ShoppingCart size={24} />
+              </div>
+              <span className="text-xs font-medium text-gray-500 bg-white/10 px-2 py-1 rounded-full">Revenue</span>
+            </div>
+            <h3 className="text-3xl font-bold text-white mb-1">₹{totalSales.toLocaleString()}</h3>
+            <p className="text-sm text-gray-400">Total Sales</p>
+          </div>
+
+          <div className="glass-card hover:bg-white/5 transition-all duration-300 group">
+            <div className="flex items-center justify-between mb-4">
+              <div className="p-3 rounded-full bg-orange-500/20 text-orange-400 group-hover:scale-110 transition-transform">
+                <TrendingUp size={24} />
+              </div>
+              <span className="text-xs font-medium text-gray-500 bg-white/10 px-2 py-1 rounded-full">Cash In</span>
+            </div>
+            <h3 className="text-3xl font-bold text-white mb-1">₹{receivedAmount.toLocaleString()}</h3>
+            <p className="text-sm text-gray-400">Received Amount</p>
+          </div>
         </div>
       </main>
-    </div>
-  );
-}
-
-function StatCard({ title, value, icon, color }: { title: string, value: string, icon: React.ReactNode, color: string }) {
-  return (
-    <div className={`p-6 rounded-2xl backdrop-blur-md border ${color} hover:scale-105 transition-transform duration-300 shadow-xl`}>
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-gray-400 font-medium">{title}</h3>
-        <div className="p-2 rounded-lg bg-white/5">{icon}</div>
-      </div>
-      <p className="text-3xl font-bold text-white">{value}</p>
     </div>
   );
 }

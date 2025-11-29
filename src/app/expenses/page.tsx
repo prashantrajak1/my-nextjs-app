@@ -1,7 +1,7 @@
 import Navbar from '@/components/Navbar';
 import { prisma } from '@/lib/db';
-import { addExpense } from '@/app/actions';
-import { PlusCircle, Calendar, Tag } from 'lucide-react';
+import { addExpense, deleteExpense } from '@/app/actions';
+import { PlusCircle, Calendar, Tag, Trash2, Edit } from 'lucide-react';
 import { format } from 'date-fns';
 import Link from 'next/link';
 
@@ -88,11 +88,17 @@ export default async function ExpensesPage() {
                                             </td>
                                             <td className="font-bold text-red-400">₹{expense.amount.toLocaleString()}</td>
                                             <td>
-                                                <Link href={`/expenses/${expense.id}/edit`}>
-                                                    <button className="text-xs bg-blue-500/20 text-blue-400 px-3 py-1 rounded hover:bg-blue-500/30 transition-colors">
-                                                        Edit
-                                                    </button>
-                                                </Link>
+                                                <div className="flex items-center gap-2">
+                                                    <Link href={`/expenses/${expense.id}/edit`} className="p-2 hover:bg-blue-500/20 text-blue-400 rounded-lg transition-colors">
+                                                        <Edit size={16} />
+                                                    </Link>
+                                                    <form action={deleteExpense}>
+                                                        <input type="hidden" name="id" value={expense.id} />
+                                                        <button type="submit" className="p-2 hover:bg-red-500/20 text-red-400 rounded-lg transition-colors">
+                                                            <Trash2 size={16} />
+                                                        </button>
+                                                    </form>
+                                                </div>
                                             </td>
                                         </tr>
                                     ))}

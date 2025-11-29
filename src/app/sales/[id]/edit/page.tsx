@@ -37,6 +37,16 @@ export default async function EditSalePage({ params }: { params: Promise<{ id: s
                                 <label className="block text-sm font-medium text-gray-300 mb-1">Vehicle Number</label>
                                 <input name="vehicleNo" type="text" defaultValue={sale.vehicleNo} className="glass-input" required />
                             </div>
+
+                            <div>
+                                <label className="block text-sm font-medium text-gray-300 mb-1">Brick Type</label>
+                                <select name="brickType" defaultValue={sale.brickType || "No.1"} className="glass-input">
+                                    <option value="No.1">Brick No.1</option>
+                                    <option value="No.2">Brick No.2</option>
+                                    <option value="No.3">Brick No.3</option>
+                                </select>
+                            </div>
+
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
                                     <label className="block text-sm font-medium text-gray-300 mb-1">Quantity</label>
