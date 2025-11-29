@@ -142,10 +142,10 @@ export default async function DashboardPage() {
     }),
     prisma.sale.count(),
     prisma.sale.findMany({
-      where: { brickType: { not: null } },
-      select: { brickType: true },
+      select: { brickType: true },   // ✅ only this
     }),
   ]);
+
 
   const totalExpenses = expenseAgg._sum.amount ?? 0;
   const totalSales = salesAgg._sum.totalAmount ?? 0;
