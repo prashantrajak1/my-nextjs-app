@@ -4,10 +4,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  // Use DATABASE_URL, which you already have in Vercel
-  url       = env("DATABASE_URL")
-  // You can add directUrl if you later configure a non-pooling URL, but it's optional
-  // directUrl = env("POSTGRES_URL_NON_POOLING")
+  url      = env("DATABASE_URL")
 }
 
 model Labor {
