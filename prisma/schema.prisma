@@ -8,15 +8,16 @@ datasource db {
 }
 
 model Labor {
-  id          String         @id @default(uuid())
-  name        String
-  address     String
-  due         Float          @default(0)
-  bricksMade  Int            @default(0)
-  daysWorked  Int            @default(0)
-  payments    LaborPayment[]
-  createdAt   DateTime       @default(now())
-  updatedAt   DateTime       @updatedAt
+  id            String                @id @default(uuid())
+  name          String
+  address       String
+  due           Float                 @default(0)
+  bricksMade    Int                   @default(0)
+  daysWorked    Int                   @default(0)
+  payments      LaborPayment[]
+  manufacturing BrickManufacturing[]
+  createdAt     DateTime              @default(now())
+  updatedAt     DateTime              @updatedAt
 }
 
 model LaborPayment {
@@ -57,6 +58,17 @@ model BrickStock {
   id        String   @id @default(uuid())
   type      String   @unique
   quantity  Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model BrickManufacturing {
+  id        String   @id @default(uuid())
+  brickType String   // "No.1", "No.2", or "No.3"
+  quantity  Int
+  date      DateTime @default(now())
+  laborId   String?
+  labor     Labor?   @relation(fields: [laborId], references: [id])
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }

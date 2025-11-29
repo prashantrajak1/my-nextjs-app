@@ -464,3 +464,69 @@ h3 {
   font-size: 11px;
   color: #6b7280;
 }
+
+/* Bricks Summary Sections */
+.dashboard-bricks-section {
+  margin-top: 20px;
+  padding: 16px;
+  border-radius: 16px;
+  border: 1px solid rgba(75, 85, 99, 0.6);
+  background: rgba(17, 24, 39, 0.4);
+}
+
+.dashboard-bricks-section-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+  color: #facc15;
+}
+
+.dashboard-bricks-section-header h3 {
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  margin: 0;
+}
+
+.dashboard-bricks-main-stat {
+  text-align: center;
+  padding: 12px 0;
+  margin-bottom: 16px;
+}
+
+.dashboard-bricks-stat-value-large {
+  font-size: 36px;
+  font-weight: 800;
+  color: #facc15;
+  line-height: 1;
+}
+
+.dashboard-bricks-breakdown {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.dashboard-bricks-breakdown-item {
+  border-radius: 12px;
+  border: 1px solid rgba(55, 65, 81, 0.8);
+  background: #020617;
+  padding: 10px 12px;
+  text-align: center;
+}
+
+.dashboard-bricks-breakdown-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: #9ca3af;
+  margin-bottom: 6px;
+}
+
+.dashboard-bricks-breakdown-value {
+  font-size: 20px;
+  font-weight: 700;
+  color: #e5e7eb;
+}

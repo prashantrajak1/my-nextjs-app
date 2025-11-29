@@ -117,6 +117,8 @@ import {
   ShoppingCart,
   TrendingUp,
   Package2,
+  Factory,
+  TrendingDown,
 } from 'lucide-react';
 
 function formatCurrency(value: number | null | undefined) {
@@ -124,16 +126,21 @@ function formatCurrency(value: number | null | undefined) {
   return `₹${value.toLocaleString('en-IN')}`;
 }
 
-// You can edit this list to match the brick types you actually produce
-const KNOWN_BRICK_TYPES = ['Normal', 'Standard', 'Premium'];
+// Brick types used in the system
+const BRICK_TYPES = ['No.1', 'No.2', 'No.3'] as const;
 
 export default async function DashboardPage() {
+  // Get current year start date
+  const currentYear = new Date().getFullYear();
+  const yearStart = new Date(currentYear, 0, 1);
+
   const [
     laborCount,
     expenseAgg,
     salesAgg,
     salesCount,
-    bricksByType,
+    salesByType,
+    manufacturingByType,
   ] = await Promise.all([
     prisma.labor.count(),
     prisma.expense.aggregate({ _sum: { amount: true } }),
@@ -141,29 +148,50 @@ export default async function DashboardPage() {
       _sum: { totalAmount: true, receivedAmount: true, quantity: true },
     }),
     prisma.sale.count(),
-    prisma.sale.findMany({
-      select: { brickType: true },   // ✅ only this
+    // Get sales grouped by brick type
+    prisma.sale.groupBy({
+      by: ['brickType'],
+      _sum: { quantity: true },
+    }),
+    // Get manufacturing data for current year grouped by brick type
+    prisma.brickManufacturing.groupBy({
+      by: ['brickType'],
+      _sum: { quantity: true },
+      where: {
+        date: { gte: yearStart },
+      },
     }),
   ]);
-
 
   const totalExpenses = expenseAgg._sum.amount ?? 0;
   const totalSales = salesAgg._sum.totalAmount ?? 0;
   const totalReceived = salesAgg._sum.receivedAmount ?? 0;
-
-  // Bricks-related numbers
   const totalBricksSold = salesAgg._sum.quantity ?? 0;
 
-  const soldTypesSet = new Set(
-    bricksByType
-      .map((b) => b.brickType)
-      .filter((t): t is string => !!t && t.trim().length > 0)
-  );
+  // Calculate manufacturing totals by type
+  const manufacturedByType: Record<string, number> = {};
+  let totalManufactured = 0;
 
-  const brickTypesSold = soldTypesSet.size;
-  const brickTypesRemaining = KNOWN_BRICK_TYPES.filter(
-    (t) => !soldTypesSet.has(t)
-  ).length;
+  manufacturingByType.forEach((item) => {
+    const qty = item._sum.quantity ?? 0;
+    manufacturedByType[item.brickType] = qty;
+    totalManufactured += qty;
+  });
+
+  // Calculate sales by type
+  const soldByType: Record<string, number> = {};
+  salesByType.forEach((item) => {
+    const qty = item._sum.quantity ?? 0;
+    soldByType[item.brickType] = qty;
+  });
+
+  // Calculate remaining by type
+  const remainingByType: Record<string, number> = {};
+  BRICK_TYPES.forEach((type) => {
+    const manufactured = manufacturedByType[type] ?? 0;
+    const sold = soldByType[type] ?? 0;
+    remainingByType[type] = manufactured - sold;
+  });
 
   const avgBricksPerSale =
     salesCount > 0 ? Math.round(totalBricksSold / salesCount) : 0;
@@ -264,13 +292,13 @@ export default async function DashboardPage() {
           </div>
         </section>
 
-        {/* BRICKS COUNT SECTION */}
+        {/* BRICKS SUMMARY SECTION */}
         <section className="dashboard-bricks-card">
           <div className="dashboard-bricks-header">
             <div className="dashboard-bricks-title-block">
-              <h2>Bricks Count</h2>
+              <h2>Bricks Summary</h2>
               <p>
-                Overview of total bricks sold and brick types performance.
+                Manufacturing, sales, and inventory overview for {currentYear}.
               </p>
             </div>
             <div className="dashboard-bricks-badge">
@@ -282,44 +310,98 @@ export default async function DashboardPage() {
             </div>
           </div>
 
-          <div className="dashboard-bricks-stats">
-            <div className="dashboard-bricks-stat">
-              <div className="dashboard-bricks-stat-label">
-                TOTAL BRICKS SOLD
+          {/* Total Manufactured Section */}
+          <div className="dashboard-bricks-section">
+            <div className="dashboard-bricks-section-header">
+              <Factory size={20} />
+              <h3>Total Bricks Manufactured ({currentYear})</h3>
+            </div>
+            <div className="dashboard-bricks-main-stat">
+              <div className="dashboard-bricks-stat-value-large">
+                {totalManufactured.toLocaleString('en-IN')}
               </div>
-              <div className="dashboard-bricks-stat-value">
+              <div className="dashboard-bricks-stat-note">
+                Total bricks produced in current year
+              </div>
+            </div>
+
+            {/* Breakdown by type */}
+            <div className="dashboard-bricks-breakdown">
+              {BRICK_TYPES.map((type) => (
+                <div key={type} className="dashboard-bricks-breakdown-item">
+                  <div className="dashboard-bricks-breakdown-label">
+                    Type {type}
+                  </div>
+                  <div className="dashboard-bricks-breakdown-value">
+                    {(manufacturedByType[type] ?? 0).toLocaleString('en-IN')}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Total Sold Section */}
+          <div className="dashboard-bricks-section">
+            <div className="dashboard-bricks-section-header">
+              <TrendingDown size={20} />
+              <h3>Total Bricks Sold</h3>
+            </div>
+            <div className="dashboard-bricks-main-stat">
+              <div className="dashboard-bricks-stat-value-large">
                 {totalBricksSold.toLocaleString('en-IN')}
               </div>
               <div className="dashboard-bricks-stat-note">
-                Sum of quantities from all sales.
+                Total bricks sold across all sales
               </div>
             </div>
 
-            <div className="dashboard-bricks-stat">
-              <div className="dashboard-bricks-stat-label">
-                BRICK TYPES SOLD
-              </div>
-              <div className="dashboard-bricks-stat-value">
-                {brickTypesSold}
+            {/* Breakdown by type */}
+            <div className="dashboard-bricks-breakdown">
+              {BRICK_TYPES.map((type) => (
+                <div key={type} className="dashboard-bricks-breakdown-item">
+                  <div className="dashboard-bricks-breakdown-label">
+                    Type {type}
+                  </div>
+                  <div className="dashboard-bricks-breakdown-value">
+                    {(soldByType[type] ?? 0).toLocaleString('en-IN')}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Remaining Inventory Section */}
+          <div className="dashboard-bricks-section">
+            <div className="dashboard-bricks-section-header">
+              <Package2 size={20} />
+              <h3>Remaining Inventory</h3>
+            </div>
+            <div className="dashboard-bricks-main-stat">
+              <div className="dashboard-bricks-stat-value-large">
+                {(totalManufactured - totalBricksSold).toLocaleString('en-IN')}
               </div>
               <div className="dashboard-bricks-stat-note">
-                Unique brick types recorded in sales.
+                Bricks available in stock
               </div>
             </div>
 
-            <div className="dashboard-bricks-stat">
-              <div className="dashboard-bricks-stat-label">
-                BRICK TYPES REMAINING
-              </div>
-              <div className="dashboard-bricks-stat-value">
-                {brickTypesRemaining}
-              </div>
-              <div className="dashboard-bricks-stat-note">
-                Based on known types: {KNOWN_BRICK_TYPES.join(', ')}.
-                Edit this list in code if needed.
-              </div>
+            {/* Breakdown by type */}
+            <div className="dashboard-bricks-breakdown">
+              {BRICK_TYPES.map((type) => (
+                <div key={type} className="dashboard-bricks-breakdown-item">
+                  <div className="dashboard-bricks-breakdown-label">
+                    Type {type}
+                  </div>
+                  <div className="dashboard-bricks-breakdown-value">
+                    {(remainingByType[type] ?? 0).toLocaleString('en-IN')}
+                  </div>
+                </div>
+              ))}
             </div>
+          </div>
 
+          {/* Additional Stats */}
+          <div className="dashboard-bricks-stats">
             <div className="dashboard-bricks-stat">
               <div className="dashboard-bricks-stat-label">
                 AVG BRICKS PER SALE
@@ -328,7 +410,7 @@ export default async function DashboardPage() {
                 {avgBricksPerSale.toLocaleString('en-IN')}
               </div>
               <div className="dashboard-bricks-stat-note">
-                Total bricks / number of sales records.
+                Average quantity per sale record
               </div>
             </div>
           </div>
