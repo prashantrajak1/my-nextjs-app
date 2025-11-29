@@ -3,15 +3,28 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "sqlite"
   url      = env("DATABASE_URL")
 }
 
 model Labor {
+  id          String         @id @default(uuid())
+  name        String
+  address     String
+  due         Float          @default(0)
+  bricksMade  Int            @default(0)
+  daysWorked  Int            @default(0)
+  payments    LaborPayment[]
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+}
+
+model LaborPayment {
   id        String   @id @default(uuid())
-  name      String
-  address   String
-  due       Float    @default(0)
+  amount    Float
+  date      DateTime @default(now())
+  laborId   String
+  labor     Labor    @relation(fields: [laborId], references: [id])
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -33,6 +46,7 @@ model Sale {
   rate           Float
   totalAmount    Float
   receivedAmount Float
+  billPath       String?
   date           DateTime @default(now())
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt

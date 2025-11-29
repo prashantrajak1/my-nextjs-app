@@ -3,6 +3,7 @@ import { prisma } from '@/lib/db';
 import { addExpense } from '@/app/actions';
 import { PlusCircle, Calendar, Tag } from 'lucide-react';
 import { format } from 'date-fns';
+import Link from 'next/link';
 
 export default async function ExpensesPage() {
     const sortedExpenses = await prisma.expense.findMany({
@@ -10,17 +11,17 @@ export default async function ExpensesPage() {
     });
 
     return (
-        <div className="container min-h-screen pb-10">
+        <div className="min-h-screen pb-10 bg-gradient-to-br from-gray-900 via-gray-800 to-black text-white">
             <Navbar />
 
-            <header className="mb-8 animate-fade-in">
+            <header className="mb-8 animate-fade-in container mx-auto px-4 pt-8">
                 <h1 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-accent">
                     Expense Management
                 </h1>
                 <p className="text-gray-400 mt-2">Track daily manufacturing expenses.</p>
             </header>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div className="container mx-auto px-4 grid grid-cols-1 lg:grid-cols-3 gap-8">
                 {/* Add Expense Form */}
                 <div className="lg:col-span-1">
                     <div className="glass-card sticky top-24 animate-fade-in" style={{ animationDelay: '0.1s' }}>
@@ -70,6 +71,7 @@ export default async function ExpensesPage() {
                                         <th>Description</th>
                                         <th>Category</th>
                                         <th>Amount</th>
+                                        <th>Action</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -80,11 +82,18 @@ export default async function ExpensesPage() {
                                             </td>
                                             <td className="font-medium text-white">{expense.description}</td>
                                             <td>
-                                                <span className="px-2 py-1 rounded-full bg-white/5 text-xs text-gray-300 border border-white/10">
+                                                <span className="text-xs font-medium px-2 py-1 rounded-full bg-white/10 text-gray-300">
                                                     {expense.category}
                                                 </span>
                                             </td>
-                                            <td className="font-bold text-red-400">- ₹{expense.amount.toLocaleString()}</td>
+                                            <td className="font-bold text-red-400">₹{expense.amount.toLocaleString()}</td>
+                                            <td>
+                                                <Link href={`/expenses/${expense.id}/edit`}>
+                                                    <button className="text-xs bg-blue-500/20 text-blue-400 px-3 py-1 rounded hover:bg-blue-500/30 transition-colors">
+                                                        Edit
+                                                    </button>
+                                                </Link>
+                                            </td>
                                         </tr>
                                     ))}
                                 </tbody>

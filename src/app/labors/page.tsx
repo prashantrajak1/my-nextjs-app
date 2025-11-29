@@ -2,6 +2,7 @@ import Navbar from '@/components/Navbar';
 import { prisma } from '@/lib/db';
 import { addLabor } from '@/app/actions';
 import { UserPlus, MapPin, DollarSign } from 'lucide-react';
+import Link from 'next/link';
 
 export default async function LaborsPage() {
     const labors = await prisma.labor.findMany({
@@ -61,6 +62,8 @@ export default async function LaborsPage() {
                                     <tr>
                                         <th>Name</th>
                                         <th>Address</th>
+                                        <th>Bricks Made</th>
+                                        <th>Days Worked</th>
                                         <th>Current Due</th>
                                         <th>Action</th>
                                     </tr>
@@ -75,11 +78,15 @@ export default async function LaborsPage() {
                                                     {labor.address}
                                                 </div>
                                             </td>
+                                            <td className="text-gray-300">{labor.bricksMade}</td>
+                                            <td className="text-gray-300">{labor.daysWorked}</td>
                                             <td className="font-bold text-red-400">₹{labor.due.toLocaleString()}</td>
                                             <td>
-                                                <button className="text-xs bg-primary/20 text-primary px-3 py-1 rounded hover:bg-primary/30 transition-colors">
-                                                    View Details
-                                                </button>
+                                                <Link href={`/labors/${labor.id}`}>
+                                                    <button className="text-xs bg-primary/20 text-primary px-3 py-1 rounded hover:bg-primary/30 transition-colors">
+                                                        View Details
+                                                    </button>
+                                                </Link>
                                             </td>
                                         </tr>
                                     ))}

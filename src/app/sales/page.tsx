@@ -1,8 +1,9 @@
 import Navbar from '@/components/Navbar';
 import { prisma } from '@/lib/db';
 import { addSale } from '@/app/actions';
-import { ShoppingCart, Calendar, Truck } from 'lucide-react';
+import { ShoppingCart, Calendar, Truck, FileText, Download } from 'lucide-react';
 import { format } from 'date-fns';
+import Link from 'next/link';
 
 export default async function SalesPage() {
     const sortedSales = await prisma.sale.findMany({
@@ -10,17 +11,25 @@ export default async function SalesPage() {
     });
 
     return (
-        <div className="container min-h-screen pb-10">
+        <div className="min-h-screen pb-10 bg-gradient-to-br from-gray-900 via-gray-800 to-black text-white">
             <Navbar />
 
-            <header className="mb-8 animate-fade-in">
-                <h1 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-accent">
-                    Sales Management
-                </h1>
-                <p className="text-gray-400 mt-2">Record brick sales and payments.</p>
+            <header className="mb-8 animate-fade-in container mx-auto px-4 pt-8">
+                <div className="flex justify-between items-end">
+                    <div>
+                        <h1 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-accent">
+                            Sales Management
+                        </h1>
+                        <p className="text-gray-400 mt-2">Record brick sales and payments.</p>
+                    </div>
+                    <a href="/api/sales/export" className="glass-button flex items-center gap-2 bg-green-500/20 text-green-400 hover:bg-green-500/30">
+                        <Download size={16} />
+                        Download Report
+                    </a>
+                </div>
             </header>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div className="container mx-auto px-4 grid grid-cols-1 lg:grid-cols-3 gap-8">
                 {/* Add Sale Form */}
                 <div className="lg:col-span-1">
                     <div className="glass-card sticky top-24 animate-fade-in" style={{ animationDelay: '0.1s' }}>
@@ -47,6 +56,10 @@ export default async function SalesPage() {
                                 <label className="block text-sm font-medium text-gray-300 mb-1">Received Amount</label>
                                 <input name="receivedAmount" type="number" step="0.01" className="glass-input" placeholder="0.00" required />
                             </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-300 mb-1">Upload Bill (Optional)</label>
+                                <input name="bill" type="file" className="glass-input file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary/20 file:text-primary hover:file:bg-primary/30" />
+                            </div>
                             <button type="submit" className="glass-button w-full">
                                 Record Sale
                             </button>
@@ -71,7 +84,9 @@ export default async function SalesPage() {
                                         <th>Details</th>
                                         <th>Total</th>
                                         <th>Received</th>
+                                        <th>Bill</th>
                                         <th>Status</th>
+                                        <th>Action</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -94,6 +109,15 @@ export default async function SalesPage() {
                                                 <td className="font-bold text-white">₹{sale.totalAmount.toLocaleString()}</td>
                                                 <td className="text-green-400">₹{sale.receivedAmount.toLocaleString()}</td>
                                                 <td>
+                                                    {sale.billPath ? (
+                                                        <a href={sale.billPath} target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:text-blue-300">
+                                                            <FileText size={16} />
+                                                        </a>
+                                                    ) : (
+                                                        <span className="text-gray-600">-</span>
+                                                    )}
+                                                </td>
+                                                <td>
                                                     {due > 0 ? (
                                                         <span className="text-red-400 text-xs font-bold bg-red-500/10 px-2 py-1 rounded">
                                                             Due: ₹{due.toLocaleString()}
@@ -103,6 +127,13 @@ export default async function SalesPage() {
                                                             Paid
                                                         </span>
                                                     )}
+                                                </td>
+                                                <td>
+                                                    <Link href={`/sales/${sale.id}/edit`}>
+                                                        <button className="text-xs bg-blue-500/20 text-blue-400 px-3 py-1 rounded hover:bg-blue-500/30 transition-colors">
+                                                            Edit
+                                                        </button>
+                                                    </Link>
                                                 </td>
                                             </tr>
                                         );
