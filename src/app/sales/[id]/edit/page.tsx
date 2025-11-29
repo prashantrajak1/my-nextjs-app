@@ -5,9 +5,10 @@ import { ShoppingCart, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 
-export default async function EditSalePage({ params }: { params: { id: string } }) {
+export default async function EditSalePage({ params }: { params: Promise<{ id: string }> }) {
+    const { id } = await params;
     const sale = await prisma.sale.findUnique({
-        where: { id: params.id }
+        where: { id }
     });
 
     if (!sale) {

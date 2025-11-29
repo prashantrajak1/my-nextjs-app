@@ -5,9 +5,10 @@ import { User, MapPin, DollarSign, Hammer, Calendar, History, ArrowLeft } from '
 import Link from 'next/link';
 import { format } from 'date-fns';
 
-export default async function LaborDetailsPage({ params }: { params: { id: string } }) {
+export default async function LaborDetailsPage({ params }: { params: Promise<{ id: string }> }) {
+    const { id } = await params;
     const labor = await prisma.labor.findUnique({
-        where: { id: params.id },
+        where: { id },
         include: {
             payments: {
                 orderBy: { date: 'desc' }

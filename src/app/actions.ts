@@ -108,20 +108,25 @@ export async function addSale(formData: FormData) {
     let billPath = null;
 
     if (billFile && billFile.size > 0) {
-        const buffer = Buffer.from(await billFile.arrayBuffer());
-        const filename = `${Date.now()}-${billFile.name.replace(/\s/g, '_')}`;
+        try {
+            const buffer = Buffer.from(await billFile.arrayBuffer());
+            const filename = `${Date.now()}-${billFile.name.replace(/\s/g, '_')}`;
 
-        // Ensure uploads directory exists
-        const fs = require('fs');
-        const path = require('path');
-        const uploadDir = path.join(process.cwd(), 'public', 'uploads');
+            // Ensure uploads directory exists
+            const fs = require('fs');
+            const path = require('path');
+            const uploadDir = path.join(process.cwd(), 'public', 'uploads');
 
-        if (!fs.existsSync(uploadDir)) {
-            fs.mkdirSync(uploadDir, { recursive: true });
+            if (!fs.existsSync(uploadDir)) {
+                fs.mkdirSync(uploadDir, { recursive: true });
+            }
+
+            fs.writeFileSync(path.join(uploadDir, filename), buffer);
+            billPath = `/uploads/${filename}`;
+        } catch (error) {
+            console.error("File upload failed (likely read-only fs):", error);
+            // Continue without saving file
         }
-
-        fs.writeFileSync(path.join(uploadDir, filename), buffer);
-        billPath = `/uploads/${filename}`;
     }
 
     const totalAmount = quantity * rate;
