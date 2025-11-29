@@ -1,3 +1,16 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Labor {
+  id          String         @id @default(uuid())
+  name        String
+  address     String
   due         Float          @default(0)
   bricksMade  Int            @default(0)
   daysWorked  Int            @default(0)
@@ -34,7 +47,7 @@ model Sale {
   totalAmount    Float
   receivedAmount Float
   billPath       String?
-  brickType      String   @default("No.1") // New field
+  brickType      String   @default("No.1")
   date           DateTime @default(now())
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
@@ -42,7 +55,7 @@ model Sale {
 
 model BrickStock {
   id        String   @id @default(uuid())
-  type      String   @unique // "No.1", "No.2", "No.3"
+  type      String   @unique
   quantity  Int      @default(0)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
