@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { LayoutDashboard, Users, DollarSign, ShoppingCart, LogOut } from 'lucide-react';
+import { LayoutDashboard, Users, DollarSign, ShoppingCart, LogOut, Factory } from 'lucide-react';
 import clsx from 'clsx';
 
 export default function Navbar() {
@@ -19,6 +19,7 @@ export default function Navbar() {
         { name: 'Dashboard', href: '/', icon: LayoutDashboard },
         { name: 'Labors', href: '/labors', icon: Users },
         { name: 'Expenses', href: '/expenses', icon: DollarSign },
+        { name: 'Manufacturing', href: '/manufacturing', icon: Factory },
         { name: 'Sales', href: '/sales', icon: ShoppingCart },
     ];
 

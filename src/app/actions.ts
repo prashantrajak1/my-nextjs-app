@@ -224,3 +224,58 @@ export async function updateBrickStock(formData: FormData) {
 
     revalidatePath('/');
 }
+
+// --- MANUFACTURING ACTIONS ---
+
+export async function addManufacturing(formData: FormData) {
+    const brickType = formData.get('brickType') as string;
+    const quantity = parseInt(formData.get('quantity') as string) || 0;
+    const laborId = (formData.get('laborId') as string) || null;
+    const dateStr = formData.get('date') as string;
+    const date = dateStr ? new Date(dateStr) : new Date();
+
+    await prisma.brickManufacturing.create({
+        data: {
+            brickType,
+            quantity,
+            laborId: laborId || undefined,
+            date,
+        },
+    });
+
+    revalidatePath('/manufacturing');
+    revalidatePath('/');
+}
+
+export async function updateManufacturing(formData: FormData) {
+    const id = formData.get('id') as string;
+    const brickType = formData.get('brickType') as string;
+    const quantity = parseInt(formData.get('quantity') as string) || 0;
+    const laborId = (formData.get('laborId') as string) || null;
+    const dateStr = formData.get('date') as string;
+    const date = dateStr ? new Date(dateStr) : new Date();
+
+    await prisma.brickManufacturing.update({
+        where: { id },
+        data: {
+            brickType,
+            quantity,
+            laborId: laborId || undefined,
+            date,
+        },
+    });
+
+    revalidatePath('/manufacturing');
+    revalidatePath('/');
+}
+
+export async function deleteManufacturing(formData: FormData) {
+    const id = formData.get('id') as string;
+
+    await prisma.brickManufacturing.delete({
+        where: { id },
+    });
+
+    revalidatePath('/manufacturing');
+    revalidatePath('/');
+}
