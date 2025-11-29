@@ -107,26 +107,28 @@
 
 // app/page.tsx  or  src/app/page.tsx
 
+// app/page.tsx or src/app/page.tsx
+
 import Navbar from '@/components/Navbar';
 import { prisma } from '@/lib/db';
-import { Users, IndianRupee, ShoppingCart, TrendingUp, Factory } from 'lucide-react';
+import {
+  Users,
+  IndianRupee,
+  ShoppingCart,
+  TrendingUp,
+  Factory,
+} from 'lucide-react';
 
-// Format helper for rupee values
 function formatCurrency(value: number | null | undefined) {
   if (value == null) return '₹0';
   return `₹${value.toLocaleString('en-IN')}`;
 }
 
 export default async function DashboardPage() {
-  // Fetch dashboard stats in parallel
   const [laborCount, expenseAgg, salesAgg] = await Promise.all([
     prisma.labor.count(),
-    prisma.expense.aggregate({
-      _sum: { amount: true },
-    }),
-    prisma.sale.aggregate({
-      _sum: { totalAmount: true, receivedAmount: true },
-    }),
+    prisma.expense.aggregate({ _sum: { amount: true } }),
+    prisma.sale.aggregate({ _sum: { totalAmount: true, receivedAmount: true } }),
   ]);
 
   const totalExpenses = expenseAgg._sum.amount ?? 0;
@@ -134,54 +136,42 @@ export default async function DashboardPage() {
   const totalReceived = salesAgg._sum.receivedAmount ?? 0;
 
   return (
-    <div className="min-h-screen bg-[radial-gradient(circle_at_top,_#0f172a,_#020617_55%,_#000_100%)] text-white">
+    <div className="min-h-screen bg-slate-950 text-slate-50">
       <Navbar />
 
-      <main className="mx-auto flex max-w-6xl flex-col gap-10 px-4 pb-12 pt-8">
-        {/* HERO SECTION */}
-        <section className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-slate-900/90 via-indigo-900/90 to-slate-900/90 px-6 py-8 shadow-2xl shadow-indigo-900/40 border border-white/10">
-          {/* subtle glow */}
-          <div className="pointer-events-none absolute inset-0 opacity-40 mix-blend-screen">
-            <div className="absolute -top-24 -left-24 h-72 w-72 rounded-full bg-amber-400/20 blur-3xl" />
-            <div className="absolute -bottom-24 right-0 h-72 w-72 rounded-full bg-indigo-500/30 blur-3xl" />
-          </div>
+      <main className="mx-auto max-w-6xl px-4 pb-10 pt-6 space-y-6">
+        {/* HEADER CARD */}
+        <section className="rounded-2xl border border-slate-700 bg-gradient-to-r from-slate-900 via-slate-900 to-slate-900 p-6 shadow-xl">
+          <div className="flex flex-col items-start gap-4 md:flex-row md:items-center md:justify-between">
+            <div className="flex items-center gap-4">
+              <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 text-slate-950 shadow-lg shadow-amber-500/40">
+                <Factory size={32} />
+              </div>
 
-          <div className="relative flex flex-col gap-8 md:flex-row md:items-center md:justify-between">
-            {/* Left: Logo + title */}
-            <div className="space-y-4">
-              <div className="flex items-center gap-4">
-                <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-amber-300 to-orange-500 text-slate-900 shadow-xl shadow-amber-500/40">
-                  <Factory size={32} />
-                </div>
-                <div>
-                  <p className="text-xs font-semibold tracking-[0.35em] text-amber-300">
-                    SANJAY ITTA UDHYOG
-                  </p>
-                  <h1 className="mt-1 text-2xl sm:text-3xl font-extrabold tracking-tight">
-                    Premium Brick Manufacturing &amp; Management System
-                  </h1>
-                  <p className="mt-1 text-xs sm:text-sm text-slate-300">
-                    Monitor labors, expenses and sales in one unified dashboard.
-                  </p>
-                </div>
+              <div>
+                <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
+                  SANJAY ITTA UDHYOG
+                </h1>
+                <p className="mt-1 text-sm text-slate-300">
+                  Premium Brick Manufacturing &amp; Management System
+                </p>
               </div>
             </div>
 
-            {/* Right: quick headline numbers */}
-            <div className="grid w-full max-w-md grid-cols-2 gap-4 text-sm">
-              <div className="rounded-2xl border border-white/10 bg-slate-950/50 p-4 shadow-lg shadow-black/40">
+            <div className="mt-2 grid w-full max-w-xs grid-cols-2 gap-3 text-sm md:mt-0">
+              <div className="rounded-xl border border-slate-700 bg-slate-950/70 px-3 py-2 text-center">
                 <p className="text-[11px] uppercase tracking-wide text-slate-400">
                   Active Labors
                 </p>
-                <p className="mt-1 text-2xl font-bold text-amber-300">
+                <p className="mt-1 text-xl font-bold text-amber-300">
                   {laborCount}
                 </p>
               </div>
-              <div className="rounded-2xl border border-white/10 bg-slate-950/50 p-4 shadow-lg shadow-black/40">
+              <div className="rounded-xl border border-slate-700 bg-slate-950/70 px-3 py-2 text-center">
                 <p className="text-[11px] uppercase tracking-wide text-slate-400">
                   Total Revenue
                 </p>
-                <p className="mt-1 text-2xl font-bold text-emerald-300">
+                <p className="mt-1 text-xl font-bold text-emerald-300">
                   {formatCurrency(totalReceived)}
                 </p>
               </div>
@@ -190,71 +180,80 @@ export default async function DashboardPage() {
         </section>
 
         {/* STATS GRID */}
-        <section className="grid gap-6 md:grid-cols-4">
+        <section className="grid gap-4 md:grid-cols-4">
           {/* Total Labors */}
-          <div className="group rounded-3xl bg-slate-950/70 border border-white/5 p-5 shadow-lg shadow-black/40 hover:border-amber-400/70 hover:shadow-amber-500/30 transition-all">
+          <div className="flex flex-col justify-between rounded-2xl border border-slate-700 bg-slate-900/90 p-4 shadow-md">
             <div className="flex items-center justify-between">
-              <div className="rounded-2xl bg-amber-400/15 p-3 text-amber-300">
-                <Users size={24} />
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-400/15 text-amber-300">
+                <Users size={22} />
               </div>
-              <span className="text-[10px] uppercase tracking-wide text-slate-400">
+              <span className="text-[11px] uppercase tracking-wide text-slate-400">
                 Workforce
               </span>
             </div>
-            <p className="mt-4 text-xs font-medium text-slate-400">Total Labors</p>
-            <p className="mt-1 text-3xl font-extrabold">{laborCount}</p>
+            <div className="mt-4">
+              <p className="text-xs text-slate-400">Total Labors</p>
+              <p className="mt-1 text-2xl font-bold">{laborCount}</p>
+            </div>
           </div>
 
           {/* Total Expenses */}
-          <div className="group rounded-3xl bg-slate-950/70 border border-white/5 p-5 shadow-lg shadow-black/40 hover:border-red-400/70 hover:shadow-red-500/30 transition-all">
+          <div className="flex flex-col justify-between rounded-2xl border border-slate-700 bg-slate-900/90 p-4 shadow-md">
             <div className="flex items-center justify-between">
-              <div className="rounded-2xl bg-red-500/15 p-3 text-red-300">
-                <IndianRupee size={24} />
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-red-500/15 text-red-300">
+                <IndianRupee size={22} />
               </div>
-              <span className="text-[10px] uppercase tracking-wide text-slate-400">
+              <span className="text-[11px] uppercase tracking-wide text-slate-400">
                 Outflow
               </span>
             </div>
-            <p className="mt-4 text-xs font-medium text-slate-400">Total Expenses</p>
-            <p className="mt-1 text-2xl font-extrabold text-red-300">
-              {formatCurrency(totalExpenses)}
-            </p>
+            <div className="mt-4">
+              <p className="text-xs text-slate-400">Total Expenses</p>
+              <p className="mt-1 text-2xl font-bold text-red-300">
+                {formatCurrency(totalExpenses)}
+              </p>
+            </div>
           </div>
 
           {/* Total Sales */}
-          <div className="group rounded-3xl bg-slate-950/70 border border-white/5 p-5 shadow-lg shadow-black/40 hover:border-sky-400/70 hover:shadow-sky-500/30 transition-all">
+          <div className="flex flex-col justify-between rounded-2xl border border-slate-700 bg-slate-900/90 p-4 shadow-md">
             <div className="flex items-center justify-between">
-              <div className="rounded-2xl bg-sky-500/15 p-3 text-sky-300">
-                <ShoppingCart size={24} />
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-sky-500/15 text-sky-300">
+                <ShoppingCart size={22} />
               </div>
-              <span className="text-[10px] uppercase tracking-wide text-slate-400">
+              <span className="text-[11px] uppercase tracking-wide text-slate-400">
                 Gross Sales
               </span>
             </div>
-            <p className="mt-4 text-xs font-medium text-slate-400">Total Sales Value</p>
-            <p className="mt-1 text-2xl font-extrabold text-sky-300">
-              {formatCurrency(totalSales)}
-            </p>
+            <div className="mt-4">
+              <p className="text-xs text-slate-400">Total Sales Value</p>
+              <p className="mt-1 text-2xl font-bold text-sky-300">
+                {formatCurrency(totalSales)}
+              </p>
+            </div>
           </div>
 
-          {/* Received Amount */}
-          <div className="group rounded-3xl bg-slate-950/70 border border-white/5 p-5 shadow-lg shadow-black/40 hover:border-emerald-400/70 hover:shadow-emerald-500/30 transition-all">
+          {/* Total Received */}
+          <div className="flex flex-col justify-between rounded-2xl border border-slate-700 bg-slate-900/90 p-4 shadow-md">
             <div className="flex items-center justify-between">
-              <div className="rounded-2xl bg-emerald-500/15 p-3 text-emerald-300">
-                <TrendingUp size={24} />
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-500/15 text-emerald-300">
+                <TrendingUp size={22} />
               </div>
-              <span className="text-[10px] uppercase tracking-wide text-slate-400">
+              <span className="text-[11px] uppercase tracking-wide text-slate-400">
                 Cash In
               </span>
             </div>
-            <p className="mt-4 text-xs font-medium text-slate-400">Total Received</p>
-            <p className="mt-1 text-2xl font-extrabold text-emerald-300">
-              {formatCurrency(totalReceived)}
-            </p>
+            <div className="mt-4">
+              <p className="text-xs text-slate-400">Total Received</p>
+              <p className="mt-1 text-2xl font-bold text-emerald-300">
+                {formatCurrency(totalReceived)}
+              </p>
+            </div>
           </div>
         </section>
       </main>
     </div>
   );
 }
+
 
