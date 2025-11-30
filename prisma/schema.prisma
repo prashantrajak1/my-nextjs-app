@@ -13,6 +13,7 @@ model Labor {
   address       String
   due           Float                 @default(0)
   bricksMade    Int                   @default(0)
+  brickRate     Float                 @default(0)
   daysWorked    Int                   @default(0)
   payments      LaborPayment[]
   manufacturing BrickManufacturing[]

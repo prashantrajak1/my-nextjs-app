@@ -9,9 +9,11 @@ export async function addLabor(formData: FormData) {
     const name = formData.get('name') as string;
     const address = formData.get('address') as string;
     const due = parseFloat(formData.get('due') as string) || 0;
+    const bricksMade = parseInt(formData.get('bricksMade') as string) || 0;
+    const brickRate = parseFloat(formData.get('brickRate') as string) || 0;
 
     await prisma.labor.create({
-        data: { name, address, due },
+        data: { name, address, due, bricksMade, brickRate },
     });
 
     revalidatePath('/labors');
