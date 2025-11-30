@@ -2,6 +2,7 @@
 
 import { prisma } from '@/lib/db';
 import { revalidatePath } from 'next/cache';
+import { redirect } from 'next/navigation';
 
 // --- LABOR ACTIONS ---
 
@@ -19,6 +20,25 @@ export async function addLabor(formData: FormData) {
     revalidatePath('/labors');
     revalidatePath('/');
 }
+
+export async function updateLabor(formData: FormData) {
+    const id = formData.get('id') as string;
+    const name = formData.get('name') as string;
+    const address = formData.get('address') as string;
+    const due = parseFloat(formData.get('due') as string) || 0;
+    const bricksMade = parseInt(formData.get('bricksMade') as string) || 0;
+    const brickRate = parseFloat(formData.get('brickRate') as string) || 0;
+
+    await prisma.labor.update({
+        where: { id },
+        data: { name, address, due, bricksMade, brickRate },
+    });
+
+    revalidatePath('/labors');
+    revalidatePath('/');
+    redirect('/labors');
+}
+
 
 export async function updateLaborStats(formData: FormData) {
     const id = formData.get('id') as string;
