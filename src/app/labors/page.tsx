@@ -1,7 +1,7 @@
 import Navbar from '@/components/Navbar';
 import { prisma } from '@/lib/db';
 import { addLabor, deleteLabor } from '@/app/actions';
-import { UserPlus, MapPin, Trash2, Download } from 'lucide-react';
+import { UserPlus, MapPin, Trash2, Download, Edit } from 'lucide-react';
 import Link from 'next/link';
 
 export default async function LaborsPage() {
@@ -103,9 +103,9 @@ export default async function LaborsPage() {
                                                 <td className="font-bold text-red-400">₹{labor.due.toLocaleString()}</td>
                                                 <td>
                                                     <div className="flex items-center gap-2">
-                                                        <Link href={`/labors/${labor.id}`}>
-                                                            <button className="text-xs bg-primary/20 text-primary px-3 py-1 rounded hover:bg-primary/30 transition-colors">
-                                                                View Details
+                                                        <Link href={`/labors/${labor.id}/edit`}>
+                                                            <button className="text-xs bg-blue-500/20 text-blue-400 px-3 py-1 rounded hover:bg-blue-500/30 transition-colors">
+                                                                <Edit size={14} />
                                                             </button>
                                                         </Link>
                                                         <form action={deleteLabor}>
