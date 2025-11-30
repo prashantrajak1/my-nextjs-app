@@ -1,7 +1,7 @@
 import Navbar from '@/components/Navbar';
 import { prisma } from '@/lib/db';
 import { addManufacturing, deleteManufacturing } from '@/app/actions';
-import { Factory, Calendar, Users, Trash2, Edit } from 'lucide-react';
+import { Factory, Calendar, Users, Trash2, Edit, Download } from 'lucide-react';
 import { format } from 'date-fns';
 import Link from 'next/link';
 
@@ -27,6 +27,10 @@ export default async function ManufacturingPage() {
                         </h1>
                         <p className="text-gray-400 mt-2">Track brick production and manufacturing data.</p>
                     </div>
+                    <a href="/api/manufacturing/export" className="glass-button flex items-center gap-2 bg-green-500/20 text-green-400 hover:bg-green-500/30">
+                        <Download size={16} />
+                        Download Report
+                    </a>
                 </div>
             </header>
 
