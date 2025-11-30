@@ -1,7 +1,7 @@
 import Navbar from '@/components/Navbar';
 import { prisma } from '@/lib/db';
 import { addExpense, deleteExpense } from '@/app/actions';
-import { PlusCircle, Calendar, Tag, Trash2, Edit } from 'lucide-react';
+import { PlusCircle, Calendar, Tag, Trash2, Edit, Download } from 'lucide-react';
 import { format } from 'date-fns';
 import Link from 'next/link';
 
@@ -15,10 +15,18 @@ export default async function ExpensesPage() {
             <Navbar />
 
             <header className="mb-8 animate-fade-in container mx-auto px-4 pt-8">
-                <h1 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-accent">
-                    Expense Management
-                </h1>
-                <p className="text-gray-400 mt-2">Track daily manufacturing expenses.</p>
+                <div className="flex justify-between items-end">
+                    <div>
+                        <h1 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-accent">
+                            Expense Management
+                        </h1>
+                        <p className="text-gray-400 mt-2">Track daily manufacturing expenses.</p>
+                    </div>
+                    <a href="/api/expenses/export" className="glass-button flex items-center gap-2 bg-green-500/20 text-green-400 hover:bg-green-500/30">
+                        <Download size={16} />
+                        Download Report
+                    </a>
+                </div>
             </header>
 
             <div className="container mx-auto px-4 grid grid-cols-1 lg:grid-cols-3 gap-8">

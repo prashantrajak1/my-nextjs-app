@@ -1,7 +1,7 @@
 import Navbar from '@/components/Navbar';
 import { prisma } from '@/lib/db';
 import { addLabor, deleteLabor } from '@/app/actions';
-import { UserPlus, MapPin, Trash2 } from 'lucide-react';
+import { UserPlus, MapPin, Trash2, Download } from 'lucide-react';
 import Link from 'next/link';
 
 export default async function LaborsPage() {
@@ -14,10 +14,18 @@ export default async function LaborsPage() {
             <Navbar />
 
             <header className="mb-8 animate-fade-in">
-                <h1 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-accent">
-                    Labor Management
-                </h1>
-                <p className="text-gray-400 mt-2">Manage laborers, payments, and dues.</p>
+                <div className="flex justify-between items-end">
+                    <div>
+                        <h1 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-accent">
+                            Labor Management
+                        </h1>
+                        <p className="text-gray-400 mt-2">Manage laborers, payments, and dues.</p>
+                    </div>
+                    <a href="/api/labors/export" className="glass-button flex items-center gap-2 bg-green-500/20 text-green-400 hover:bg-green-500/30">
+                        <Download size={16} />
+                        Download Report
+                    </a>
+                </div>
             </header>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
