@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import Link from 'next/link';
 import { LogIn, Mail, Lock } from 'lucide-react';
 
 export default function LoginForm() {
@@ -110,15 +109,7 @@ export default function LoginForm() {
                     </button>
                 </form>
 
-                <div className="mt-6 text-center text-sm text-gray-400">
-                    Don&apos;t have an account?{' '}
-                    <Link
-                        href="/register"
-                        className="text-primary hover:text-primary/80 font-medium transition-colors"
-                    >
-                        Register here
-                    </Link>
-                </div>
+
             </div>
         </div>
     );

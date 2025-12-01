@@ -74,13 +74,4 @@ model BrickManufacturing {
   updatedAt DateTime @updatedAt
 }
 
-model User {
-  id            String   @id @default(uuid())
-  email         String   @unique
-  password      String
-  name          String?
-  mobile        String?
-  profileImage  String?
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-}
+
