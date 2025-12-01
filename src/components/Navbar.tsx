@@ -27,10 +27,10 @@ export default function Navbar() {
         <nav className="glass-panel mb-8 p-4 flex justify-between items-center sticky top-4 z-50">
             <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-primary to-accent flex items-center justify-center font-bold text-white text-xl shadow-lg">
-                    S
+
                 </div>
                 <span className="font-bold text-xl hidden sm:block bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-                    Sanjay Itta Udhyog
+                    संजय इट्टा उद्योग
                 </span>
             </div>
 
