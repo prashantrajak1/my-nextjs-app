@@ -3,6 +3,7 @@
 import { prisma } from '@/lib/db';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
+import bcrypt from 'bcryptjs';
 
 // --- LABOR ACTIONS ---
 
@@ -300,4 +301,48 @@ export async function deleteManufacturing(formData: FormData) {
 
     revalidatePath('/manufacturing');
     revalidatePath('/');
+}
+
+// --- USER PROFILE ACTIONS ---
+
+export async function updateProfile(formData: FormData) {
+    const id = formData.get('id') as string;
+    const name = formData.get('name') as string;
+    const mobile = formData.get('mobile') as string;
+    // Email is usually not changed directly or needs verification, skipping for now as per plan
+
+    await prisma.user.update({
+        where: { id },
+        data: { name, mobile },
+    });
+
+    revalidatePath('/settings');
+}
+
+export async function changePassword(formData: FormData) {
+    const id = formData.get('id') as string;
+    const currentPassword = formData.get('currentPassword') as string;
+    const newPassword = formData.get('newPassword') as string;
+    const confirmPassword = formData.get('confirmPassword') as string;
+
+    if (newPassword !== confirmPassword) {
+        throw new Error("New passwords do not match");
+    }
+
+    const user = await prisma.user.findUnique({ where: { id } });
+    if (!user) throw new Error("User not found");
+
+    const isValid = await bcrypt.compare(currentPassword, user.password);
+    if (!isValid) {
+        throw new Error("Incorrect current password");
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    await prisma.user.update({
+        where: { id },
+        data: { password: hashedPassword },
+    });
+
+    revalidatePath('/settings');
 }
