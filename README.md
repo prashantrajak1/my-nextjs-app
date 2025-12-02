@@ -34,13 +34,14 @@ This **ERP (Enterprise Resource Planning)** solution automates these processes, 
 
 ---
 
-## Getting Started
+## OUTPUT
+
+<img width="1327" height="831" alt="Screenshot 2025-12-02 094339" src="https://github.com/user-attachments/assets/30502405-6778-4bc2-8a72-9546702daf1f" />
 
 
-<img width="1327" height="831" alt="Screenshot 2025-12-02 094339" 
-  src="https://github.com/user-attachments/assets/adb20ec4-d151-44ef-b9a1-1b401f6f1d3d" />
+<img width="1693" height="848" alt="Screenshot 2025-12-02 094351" src="https://github.com/user-attachments/assets/609bf8fd-77d8-4444-b9a1-9fe4c4280ab0" />
 
-```<img width="1693" height="848" alt="Screenshot 2025-12-02 094351" src="https://github.com/user-attachments/assets/d3727a23-6421-4b50-a9e9-45165dc4eed2" />
+
 
 
 Open (https://my-nextjs-e37zoc90w-prashant-rajaks-projects.vercel.app/login ) with your browser to see the result.
