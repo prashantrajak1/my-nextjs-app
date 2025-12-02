@@ -1,3 +1,6 @@
+export const dynamic = 'force-dynamic';
+
+
 import Navbar from '@/components/Navbar';
 import { prisma } from '@/lib/db';
 import { addLabor, deleteLabor } from '@/app/actions';

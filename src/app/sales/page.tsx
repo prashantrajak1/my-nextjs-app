@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import Navbar from '@/components/Navbar';
 import { prisma } from '@/lib/db';
 import { addSale, deleteSale } from '@/app/actions';
@@ -65,10 +67,6 @@ export default async function SalesPage() {
                             <div>
                                 <label className="block text-sm font-medium text-gray-300 mb-1">Received Amount</label>
                                 <input name="receivedAmount" type="number" step="0.01" className="glass-input" placeholder="0.00" required />
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-300 mb-1">Upload Bill (Optional)</label>
-                                <input name="bill" type="file" className="glass-input file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary/20 file:text-primary hover:file:bg-primary/30" />
                             </div>
                             <button type="submit" className="glass-button w-full">
                                 Record Sale

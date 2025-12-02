@@ -132,25 +132,6 @@ export async function addSale(formData: FormData) {
     const receivedAmount = parseFloat(formData.get('receivedAmount') as string) || 0;
     const brickType = (formData.get('brickType') as string) || "No.1";
 
-    // Handle file upload
-    const billFile = formData.get('bill') as File | null;
-    let billPath = null;
-
-    if (billFile && billFile.size > 0) {
-        try {
-            const buffer = Buffer.from(await billFile.arrayBuffer());
-            const filename = `${Date.now()}-${billFile.name.replace(/\s/g, '_')}`;
-            const fs = require('fs');
-            const path = require('path');
-            const uploadDir = path.join(process.cwd(), 'public', 'uploads');
-            if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
-            fs.writeFileSync(path.join(uploadDir, filename), buffer);
-            billPath = `/uploads/${filename}`;
-        } catch (error) {
-            console.error("File upload failed:", error);
-        }
-    }
-
     const totalAmount = quantity * rate;
 
     await prisma.$transaction([
@@ -161,7 +142,6 @@ export async function addSale(formData: FormData) {
                 rate,
                 totalAmount,
                 receivedAmount,
-                billPath,
                 brickType,
             },
         }),

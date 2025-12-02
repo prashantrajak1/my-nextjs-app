@@ -1,3 +1,6 @@
+export const dynamic = 'force-dynamic';
+
+
 import Navbar from '@/components/Navbar';
 import { prisma } from '@/lib/db';
 import { addExpense, deleteExpense } from '@/app/actions';
