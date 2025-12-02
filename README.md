@@ -36,16 +36,11 @@ This **ERP (Enterprise Resource Planning)** solution automates these processes, 
 
 ## Getting Started
 
-First, run the development server:
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+<img width="1327" height="831" alt="Screenshot 2025-12-02 094339" 
+  src="https://github.com/user-attachments/assets/adb20ec4-d151-44ef-b9a1-1b401f6f1d3d" />
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+```<img width="1693" height="848" alt="Screenshot 2025-12-02 094351" src="https://github.com/user-attachments/assets/d3727a23-6421-4b50-a9e9-45165dc4eed2" />
+
+
+Open (https://my-nextjs-e37zoc90w-prashant-rajaks-projects.vercel.app/login ) with your browser to see the result.
