@@ -34,18 +34,14 @@ This **ERP (Enterprise Resource Planning)** solution automates these processes, 
 
 ---
 
-## Getting Started
+## OUTPUT
 
-First, run the development server:
+<img width="1327" height="831" alt="Screenshot 2025-12-02 094339" src="https://github.com/user-attachments/assets/30502405-6778-4bc2-8a72-9546702daf1f" />
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+<img width="1693" height="848" alt="Screenshot 2025-12-02 094351" src="https://github.com/user-attachments/assets/609bf8fd-77d8-4444-b9a1-9fe4c4280ab0" />
+
+
+
+
+Open (https://my-nextjs-e37zoc90w-prashant-rajaks-projects.vercel.app/login ) with your browser to see the result.
