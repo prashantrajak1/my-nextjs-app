@@ -84,6 +84,7 @@ export default async function LaborsPage() {
                                         <th>Bricks Made</th>
                                         <th>Rate/Brick</th>
                                         <th>Money to Pay</th>
+                                        <th>Amount to be Paid</th>
                                         <th>Current Due</th>
                                         <th>Action</th>
                                     </tr>
@@ -103,6 +104,7 @@ export default async function LaborsPage() {
                                                 <td className="text-gray-300">{labor.bricksMade.toLocaleString()}</td>
                                                 <td className="text-gray-300">₹{labor.brickRate.toFixed(2)}</td>
                                                 <td className="font-bold text-green-400">₹{moneyToPay.toLocaleString()}</td>
+                                                <td className="font-bold text-yellow-400">₹{(moneyToPay - labor.due).toLocaleString()}</td>
                                                 <td className="font-bold text-red-400">₹{labor.due.toLocaleString()}</td>
                                                 <td>
                                                     <div className="flex items-center gap-2">
