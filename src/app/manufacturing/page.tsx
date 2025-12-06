@@ -6,6 +6,7 @@ import { addManufacturing, deleteManufacturing } from '@/app/actions';
 import { Factory, Calendar, Users, Trash2, Edit, Download } from 'lucide-react';
 import { format } from 'date-fns';
 import Link from 'next/link';
+import DeleteButton from '@/components/DeleteButton';
 
 export default async function ManufacturingPage() {
     const sortedManufacturing = await prisma.brickManufacturing.findMany({
@@ -144,10 +145,7 @@ export default async function ManufacturingPage() {
                                                         </button>
                                                     </Link>
                                                     <form action={deleteManufacturing}>
-                                                        <input type="hidden" name="id" value={record.id} />
-                                                        <button type="submit" className="text-xs bg-red-500/20 text-red-400 px-3 py-1 rounded hover:bg-red-500/30 transition-colors">
-                                                            <Trash2 size={14} />
-                                                        </button>
+                                                        <DeleteButton id={record.id} action={deleteManufacturing} label="" className="text-xs bg-red-500/20 text-red-400 px-3 py-1 rounded hover:bg-red-500/30 transition-colors" />
                                                     </form>
                                                 </div>
                                             </td>

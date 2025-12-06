@@ -7,6 +7,7 @@ import { addExpense, deleteExpense } from '@/app/actions';
 import { PlusCircle, Calendar, Tag, Trash2, Edit, Download } from 'lucide-react';
 import { format } from 'date-fns';
 import Link from 'next/link';
+import DeleteButton from '@/components/DeleteButton';
 
 export default async function ExpensesPage() {
     const sortedExpenses = await prisma.expense.findMany({
@@ -104,10 +105,7 @@ export default async function ExpensesPage() {
                                                         <Edit size={16} />
                                                     </Link>
                                                     <form action={deleteExpense}>
-                                                        <input type="hidden" name="id" value={expense.id} />
-                                                        <button type="submit" className="p-2 hover:bg-red-500/20 text-red-400 rounded-lg transition-colors">
-                                                            <Trash2 size={16} />
-                                                        </button>
+                                                        <DeleteButton id={expense.id} action={deleteExpense} label="" className="p-2 hover:bg-red-500/20 text-red-400 rounded-lg transition-colors" />
                                                     </form>
                                                 </div>
                                             </td>

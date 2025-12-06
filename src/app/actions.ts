@@ -11,11 +11,10 @@ export async function addLabor(formData: FormData) {
     const name = formData.get('name') as string;
     const address = formData.get('address') as string;
     const due = parseFloat(formData.get('due') as string) || 0;
-    const bricksMade = parseInt(formData.get('bricksMade') as string) || 0;
     const brickRate = parseFloat(formData.get('brickRate') as string) || 0;
 
     await prisma.labor.create({
-        data: { name, address, due, bricksMade, brickRate },
+        data: { name, address, due, bricksMade: 0, brickRate },
     });
 
     revalidatePath('/labors');
@@ -78,9 +77,32 @@ export async function addLaborPayment(formData: FormData) {
 export async function deleteLabor(formData: FormData) {
     const id = formData.get('id') as string;
 
-    // Delete related payments first (cascade usually handles this but explicit is safe)
-    await prisma.laborPayment.deleteMany({ where: { laborId: id } });
-    await prisma.labor.delete({ where: { id } });
+    await prisma.$transaction(async (tx) => {
+        // 1. Unlink Manufacturing Records (Set laborId to null)
+        await tx.brickManufacturing.updateMany({
+            where: { laborId: id },
+            data: { laborId: null }
+        });
+
+        // 2. Delete Daily Records (and linked Expenses)
+        // First find expenses to delete
+        const dailyRecords = await tx.laborDailyRecord.findMany({
+            where: { laborId: id },
+            select: { expenseId: true }
+        });
+        const expenseIds = dailyRecords.map(r => r.expenseId).filter(Boolean) as string[];
+
+        if (expenseIds.length > 0) {
+            await tx.expense.deleteMany({ where: { id: { in: expenseIds } } });
+        }
+        await tx.laborDailyRecord.deleteMany({ where: { laborId: id } });
+
+        // 3. Delete Payments
+        await tx.laborPayment.deleteMany({ where: { laborId: id } });
+
+        // 4. Delete Labor
+        await tx.labor.delete({ where: { id } });
+    });
 
     revalidatePath('/labors');
     revalidatePath('/');

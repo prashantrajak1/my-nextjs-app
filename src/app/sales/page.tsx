@@ -6,6 +6,7 @@ import { addSale, deleteSale } from '@/app/actions';
 import { ShoppingCart, Calendar, Truck, FileText, Download, Trash2, Edit } from 'lucide-react';
 import { format } from 'date-fns';
 import Link from 'next/link';
+import DeleteButton from '@/components/DeleteButton';
 
 export default async function SalesPage() {
     const sortedSales = await prisma.sale.findMany({
@@ -146,10 +147,7 @@ export default async function SalesPage() {
                                                             </button>
                                                         </Link>
                                                         <form action={deleteSale}>
-                                                            <input type="hidden" name="id" value={sale.id} />
-                                                            <button type="submit" className="text-xs bg-red-500/20 text-red-400 px-3 py-1 rounded hover:bg-red-500/30 transition-colors">
-                                                                <Trash2 size={14} />
-                                                            </button>
+                                                            <DeleteButton id={sale.id} action={deleteSale} label="" className="text-xs bg-red-500/20 text-red-400 px-3 py-1 rounded hover:bg-red-500/30 transition-colors" />
                                                         </form>
                                                     </div>
                                                 </td>
