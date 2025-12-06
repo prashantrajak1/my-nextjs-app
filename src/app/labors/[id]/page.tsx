@@ -1,153 +1,106 @@
 import Navbar from '@/components/Navbar';
 import { prisma } from '@/lib/db';
-import { updateLaborStats, addLaborPayment } from '@/app/actions';
-import { User, MapPin, DollarSign, Hammer, Calendar, History, ArrowLeft } from 'lucide-react';
+import { addLaborDailyRecord, deleteLaborDailyRecord, toggleLaborRecordPaid } from '@/app/actions';
+import { ArrowLeft, Plus, Trash2, Calendar, CheckCircle, XCircle } from 'lucide-react';
 import Link from 'next/link';
-import { format } from 'date-fns';
+import { redirect } from 'next/navigation';
+import DailyRecordList from './DailyRecordList'; // Client component for interactivity
 
-export default async function LaborDetailsPage({ params }: { params: Promise<{ id: string }> }) {
-    const { id } = await params;
+export const dynamic = 'force-dynamic';
+
+export default async function LaborDetailsPage({ params }: { params: { id: string } }) {
     const labor = await prisma.labor.findUnique({
-        where: { id },
+        where: { id: params.id },
         include: {
-            payments: {
+            dailyRecords: {
                 orderBy: { date: 'desc' }
             }
         }
     });
 
     if (!labor) {
-        return <div>Labor not found</div>;
+        redirect('/labors');
     }
 
     return (
-        <div className="min-h-screen pb-10 bg-gradient-to-br from-gray-900 via-gray-800 to-black text-white">
+        <div className="container min-h-screen pb-10">
             <Navbar />
 
-            <div className="container mx-auto px-4 py-8">
-                <Link href="/labors" className="inline-flex items-center text-gray-400 hover:text-white mb-6 transition-colors">
-                    <ArrowLeft size={20} className="mr-2" />
-                    Back to List
+            <div className="mb-8 animate-fade-in">
+                <Link href="/labors" className="inline-flex items-center gap-2 text-gray-400 hover:text-white mb-4 transition-colors">
+                    <ArrowLeft size={20} />
+                    Back to Labor List
                 </Link>
 
-                {/* Header */}
-                <div className="glass-card mb-8 animate-fade-in">
-                    <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
+                    <div>
+                        <h1 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-accent">
+                            {labor.name}
+                        </h1>
+                        <p className="text-gray-400 mt-2 flex items-center gap-2">
+                            <span className="bg-white/10 px-2 py-1 rounded text-sm">{labor.address}</span>
+                            <span className="bg-white/10 px-2 py-1 rounded text-sm">Rate: ₹{labor.brickRate}</span>
+                        </p>
+                    </div>
+
+                    <div className="glass-panel p-4 flex gap-8">
                         <div>
-                            <h1 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-accent mb-2">
-                                {labor.name}
-                            </h1>
-                            <div className="flex items-center text-gray-400">
-                                <MapPin size={16} className="mr-2" />
-                                {labor.address}
-                            </div>
+                            <div className="text-sm text-gray-400">Total Bricks</div>
+                            <div className="text-2xl font-bold text-white">{labor.bricksMade.toLocaleString()}</div>
                         </div>
-                        <div className="text-right">
-                            <p className="text-sm text-gray-400">Current Due</p>
-                            <p className="text-4xl font-bold text-red-400">₹{labor.due.toLocaleString()}</p>
+                        <div>
+                            <div className="text-sm text-gray-400">Current Due</div>
+                            <div className={`text-2xl font-bold ${labor.due > 0 ? 'text-red-400' : 'text-green-400'}`}>
+                                ₹{labor.due.toLocaleString()}
+                            </div>
                         </div>
                     </div>
                 </div>
+            </div>
 
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    {/* Stats & Update Form */}
-                    <div className="lg:col-span-2 space-y-8">
-                        {/* Stats Cards */}
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div className="glass-card flex items-center gap-4">
-                                <div className="p-3 rounded-full bg-orange-500/20 text-orange-400">
-                                    <Hammer size={24} />
-                                </div>
-                                <div>
-                                    <p className="text-sm text-gray-400">Bricks Made</p>
-                                    <p className="text-2xl font-bold">{labor.bricksMade.toLocaleString()}</p>
-                                </div>
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                {/* Add Daily Record Form */}
+                <div className="lg:col-span-1">
+                    <div className="glass-card sticky top-24 animate-fade-in" style={{ animationDelay: '0.1s' }}>
+                        <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
+                            <Calendar size={20} className="text-primary" />
+                            Add Daily Entry
+                        </h2>
+                        <form action={addLaborDailyRecord} className="space-y-4">
+                            <input type="hidden" name="laborId" value={labor.id} />
+                            <input type="hidden" name="brickRate" value={labor.brickRate} />
+
+                            <div>
+                                <label className="block text-sm font-medium text-gray-300 mb-1">Date</label>
+                                <input
+                                    name="date"
+                                    type="date"
+                                    className="glass-input"
+                                    defaultValue={new Date().toISOString().split('T')[0]}
+                                    required
+                                />
                             </div>
-                            <div className="glass-card flex items-center gap-4">
-                                <div className="p-3 rounded-full bg-blue-500/20 text-blue-400">
-                                    <Calendar size={24} />
-                                </div>
-                                <div>
-                                    <p className="text-sm text-gray-400">Days Worked</p>
-                                    <p className="text-2xl font-bold">{labor.daysWorked}</p>
-                                </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-300 mb-1">Bricks Made</label>
+                                <input name="bricksMade" type="number" className="glass-input" placeholder="0" defaultValue="0" />
                             </div>
-                        </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-300 mb-1">Payment Given (₹)</label>
+                                <input name="payment" type="number" step="0.01" className="glass-input" placeholder="0.00" defaultValue="0" />
+                            </div>
 
-                        {/* Update Stats Form */}
-                        <div className="glass-card">
-                            <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
-                                <Hammer size={20} className="text-primary" />
-                                Update Work Stats
-                            </h2>
-                            <form action={updateLaborStats} className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <input type="hidden" name="id" value={labor.id} />
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-300 mb-1">Add Bricks Made</label>
-                                    <input name="bricksMade" type="number" className="glass-input" placeholder="0" />
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-300 mb-1">Add Days Worked</label>
-                                    <input name="daysWorked" type="number" className="glass-input" placeholder="0" />
-                                </div>
-                                <div className="md:col-span-2">
-                                    <button type="submit" className="glass-button w-full">
-                                        Update Stats
-                                    </button>
-                                </div>
-                            </form>
-                        </div>
-
-                        {/* Payment History */}
-                        <div className="glass-card">
-                            <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
-                                <History size={20} className="text-primary" />
-                                Payment History
-                            </h2>
-                            {labor.payments.length === 0 ? (
-                                <p className="text-gray-400 text-center py-4">No payments recorded yet.</p>
-                            ) : (
-                                <div className="glass-table-container">
-                                    <table className="glass-table">
-                                        <thead>
-                                            <tr>
-                                                <th>Date</th>
-                                                <th>Amount</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {labor.payments.map((payment) => (
-                                                <tr key={payment.id}>
-                                                    <td className="text-gray-400">{format(new Date(payment.date), 'PPP')}</td>
-                                                    <td className="font-bold text-green-400">₹{payment.amount.toLocaleString()}</td>
-                                                </tr>
-                                            ))}
-                                        </tbody>
-                                    </table>
-                                </div>
-                            )}
-                        </div>
+                            <button type="submit" className="glass-button w-full flex justify-center items-center gap-2">
+                                <Plus size={18} />
+                                Add Record
+                            </button>
+                        </form>
                     </div>
+                </div>
 
-                    {/* Add Payment Form */}
-                    <div className="lg:col-span-1">
-                        <div className="glass-card sticky top-24">
-                            <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
-                                <DollarSign size={20} className="text-green-400" />
-                                Record Payment
-                            </h2>
-                            <form action={addLaborPayment} className="space-y-4">
-                                <input type="hidden" name="laborId" value={labor.id} />
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-300 mb-1">Amount Paid</label>
-                                    <input name="amount" type="number" step="0.01" className="glass-input" placeholder="0.00" required />
-                                </div>
-                                <button type="submit" className="glass-button w-full bg-green-500/20 hover:bg-green-500/30 text-green-400 border-green-500/50">
-                                    Record Payment
-                                </button>
-                            </form>
-                        </div>
-                    </div>
+                {/* Daily Records List */}
+                <div className="lg:col-span-2 animate-fade-in" style={{ animationDelay: '0.2s' }}>
+                    <h2 className="text-xl font-bold mb-4">Daily Records</h2>
+                    <DailyRecordList records={labor.dailyRecords} laborId={labor.id} />
                 </div>
             </div>
         </div>

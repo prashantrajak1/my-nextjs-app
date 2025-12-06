@@ -281,3 +281,96 @@ export async function deleteManufacturing(formData: FormData) {
     revalidatePath('/manufacturing');
     revalidatePath('/');
 }
+
+export async function addLaborDailyRecord(formData: FormData) {
+    const laborId = formData.get('laborId') as string;
+    const dateStr = formData.get('date') as string;
+    const date = dateStr ? new Date(dateStr) : new Date();
+    const bricksMade = parseInt(formData.get('bricksMade') as string) || 0;
+    const payment = parseFloat(formData.get('payment') as string) || 0;
+    const brickRate = parseFloat(formData.get('brickRate') as string) || 0;
+
+    await prisma.$transaction(async (tx) => {
+        // 1. Create Daily Record
+        await tx.laborDailyRecord.create({
+            data: {
+                laborId,
+                date,
+                bricksMade,
+                payment,
+                brickRate,
+                isPaid: false
+            }
+        });
+
+        // 2. Update Labor Totals
+        const workValue = bricksMade * brickRate;
+        const netDueChange = workValue - payment;
+
+        await tx.labor.update({
+            where: { id: laborId },
+            data: {
+                bricksMade: { increment: bricksMade },
+                due: { increment: netDueChange }
+            }
+        });
+
+        // 3. Update Global Brick Stock
+        if (bricksMade > 0) {
+            await tx.brickStock.upsert({
+                where: { type: "No.1" },
+                update: { quantity: { increment: bricksMade } },
+                create: { type: "No.1", quantity: bricksMade },
+            });
+        }
+    });
+
+    revalidatePath(`/labors/${laborId}`);
+    revalidatePath('/labors');
+    revalidatePath('/');
+}
+
+export async function toggleLaborRecordPaid(id: string, isPaid: boolean) {
+    await prisma.laborDailyRecord.update({
+        where: { id },
+        data: { isPaid }
+    });
+    revalidatePath('/labors');
+}
+
+export async function deleteLaborDailyRecord(formData: FormData) {
+    const id = formData.get('id') as string;
+    const laborId = formData.get('laborId') as string;
+
+    const record = await prisma.laborDailyRecord.findUnique({ where: { id } });
+    if (!record) return;
+
+    await prisma.$transaction(async (tx) => {
+        // 1. Delete Record
+        await tx.laborDailyRecord.delete({ where: { id } });
+
+        // 2. Revert Labor Totals
+        const workValue = record.bricksMade * record.brickRate;
+        const netDueChange = workValue - record.payment;
+
+        await tx.labor.update({
+            where: { id: laborId },
+            data: {
+                bricksMade: { decrement: record.bricksMade },
+                due: { decrement: netDueChange }
+            }
+        });
+
+        // 3. Revert Stock
+        if (record.bricksMade > 0) {
+            await tx.brickStock.update({
+                where: { type: "No.1" },
+                data: { quantity: { decrement: record.bricksMade } }
+            });
+        }
+    });
+
+    revalidatePath(`/labors/${laborId}`);
+    revalidatePath('/labors');
+    revalidatePath('/');
+}

@@ -19,6 +19,20 @@ model Labor {
   manufacturing BrickManufacturing[]
   createdAt     DateTime              @default(now())
   updatedAt     DateTime              @updatedAt
+  dailyRecords  LaborDailyRecord[]
+}
+
+model LaborDailyRecord {
+  id          String   @id @default(uuid())
+  date        DateTime @default(now())
+  bricksMade  Int      @default(0)
+  brickRate   Float    @default(0)
+  payment     Float    @default(0)
+  isPaid      Boolean  @default(false)
+  laborId     String
+  labor       Labor    @relation(fields: [laborId], references: [id])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
 model LaborPayment {
