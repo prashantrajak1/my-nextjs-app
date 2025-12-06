@@ -292,6 +292,22 @@ export async function addLaborDailyRecord(formData: FormData) {
 
     await prisma.$transaction(async (tx) => {
         // 1. Create Daily Record
+        // If payment > 0, create expense and link it
+        let expenseId = undefined;
+        if (payment > 0) {
+            // Fetch labor name for description
+            const labor = await tx.labor.findUnique({ where: { id: laborId } });
+            const expense = await tx.expense.create({
+                data: {
+                    description: `Labor Payment: ${labor?.name || 'Unknown'}`,
+                    amount: payment,
+                    category: 'Labor',
+                    date: date
+                }
+            });
+            expenseId = expense.id;
+        }
+
         await tx.laborDailyRecord.create({
             data: {
                 laborId,
@@ -299,7 +315,8 @@ export async function addLaborDailyRecord(formData: FormData) {
                 bricksMade,
                 payment,
                 brickRate,
-                isPaid: false
+                isPaid: false,
+                expenseId // Link the expense if created
             }
         });
 
@@ -346,7 +363,11 @@ export async function deleteLaborDailyRecord(formData: FormData) {
     if (!record) return;
 
     await prisma.$transaction(async (tx) => {
-        // 1. Delete Record
+        // 1. Delete Record and Linked Expense
+        // If there is an expenseId, delete the expense (optional, but good for cleanup if not cascaded)
+        if (record.expenseId) {
+            await tx.expense.delete({ where: { id: record.expenseId } });
+        }
         await tx.laborDailyRecord.delete({ where: { id } });
 
         // 2. Revert Labor Totals
