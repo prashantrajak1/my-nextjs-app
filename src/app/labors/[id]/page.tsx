@@ -8,9 +8,10 @@ import DailyRecordList from './DailyRecordList'; // Client component for interac
 
 export const dynamic = 'force-dynamic';
 
-export default async function LaborDetailsPage({ params }: { params: { id: string } }) {
+export default async function LaborDetailsPage({ params }: { params: Promise<{ id: string }> }) {
+    const { id } = await params;
     const labor = await prisma.labor.findUnique({
-        where: { id: params.id },
+        where: { id },
         include: {
             dailyRecords: {
                 orderBy: { date: 'desc' }
