@@ -28,17 +28,15 @@ export async function GET(request: Request) {
         orderBy: { createdAt: 'desc' }
     });
 
-    const csvHeader = 'Name,Address,Bricks Made,Rate per Brick,Money to Pay,Current Due,Total Payments,Payment Count\n';
+    const csvHeader = 'Name,Address,Total Bricks Made,Rate per Brick,Total Paid,Current Advance (Due)\n';
 
     const csvRows = labors.map(labor => {
         const totalPayments = labor.payments.reduce((sum: number, p: any) => sum + p.amount, 0);
-        const paymentCount = labor.payments.length;
-        const moneyToPay = labor.bricksMade * labor.brickRate;
         // Escape commas in name and address
         const name = labor.name.replace(/,/g, ';');
         const address = labor.address.replace(/,/g, ';');
 
-        return `${name},${address},${labor.bricksMade},${labor.brickRate},${moneyToPay},${labor.due},${totalPayments},${paymentCount}`;
+        return `${name},${address},${labor.bricksMade},${labor.brickRate},${totalPayments},${labor.due}`;
     });
 
     const csvContent = csvHeader + csvRows.join('\n');

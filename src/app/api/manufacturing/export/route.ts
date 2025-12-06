@@ -26,14 +26,13 @@ export async function GET(request: Request) {
         orderBy: { date: 'desc' }
     });
 
-    const csvHeader = 'Date,Brick Type,Quantity,Labor Name,Labor ID\n';
+    const csvHeader = 'Date,Brick Type,Quantity,Labor Name\n';
 
     const csvRows = manufacturing.map(record => {
         const date = format(new Date(record.date), 'yyyy-MM-dd');
         const laborName = record.labor ? record.labor.name : 'N/A';
-        const laborId = record.laborId || 'N/A';
 
-        return `${date},${record.brickType},${record.quantity},${laborName},${laborId}`;
+        return `${date},${record.brickType},${record.quantity},${laborName}`;
     });
 
     const csvContent = csvHeader + csvRows.join('\n');
