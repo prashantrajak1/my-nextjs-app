@@ -141,6 +141,9 @@ export default async function DashboardPage() {
     salesCount,
     salesByType,
     manufacturingByType,
+    totalAdvanceAgg,
+    totalLaborPaidAgg,
+    rawBricksAgg,
   ] = await Promise.all([
     prisma.labor.count(),
     prisma.expense.aggregate({ _sum: { amount: true } }),
@@ -161,7 +164,25 @@ export default async function DashboardPage() {
         date: { gte: yearStart },
       },
     }),
+    // Labor Financials: Total Advance (Sum of positive due)
+    prisma.labor.aggregate({
+      _sum: { due: true },
+      where: { due: { gt: 0 } },
+    }),
+    // Labor Financials: Total Labor Expenses
+    prisma.expense.aggregate({
+      _sum: { amount: true },
+      where: { category: 'Labor' },
+    }),
+    // Total Raw Bricks (Sum of bricks made by all labors)
+    prisma.labor.aggregate({
+      _sum: { bricksMade: true },
+    }),
   ]);
+
+  const totalAdvance = totalAdvanceAgg._sum.due ?? 0;
+  const totalLaborPaid = totalLaborPaidAgg._sum.amount ?? 0;
+  const totalRawBricks = rawBricksAgg._sum.bricksMade ?? 0;
 
   const totalExpenses = expenseAgg._sum.amount ?? 0;
   const totalSales = salesAgg._sum.totalAmount ?? 0;
@@ -292,6 +313,41 @@ export default async function DashboardPage() {
           </div>
         </section>
 
+        {/* LABOR FINANCIALS SECTION */}
+        <section className="dashboard-grid mt-6 mb-6">
+          {/* Outstanding Advance */}
+          <div className="dashboard-card" style={{ borderColor: 'rgba(239, 68, 68, 0.5)' }}>
+            <div className="dashboard-card-header">
+              <div className="dashboard-card-icon" style={{ background: 'rgba(239, 68, 68, 0.15)', color: '#ef4444' }}>
+                <IndianRupee size={22} />
+              </div>
+              <div className="dashboard-card-label" style={{ color: '#fca5a5' }}>OUTSTANDING ADVANCE</div>
+            </div>
+            <div>
+              <div className="dashboard-card-title">Total Advance Given</div>
+              <div className="dashboard-card-value" style={{ color: '#ef4444' }}>
+                {formatCurrency(totalAdvance)}
+              </div>
+            </div>
+          </div>
+
+          {/* Total Labor Payments */}
+          <div className="dashboard-card" style={{ borderColor: 'rgba(59, 130, 246, 0.5)' }}>
+            <div className="dashboard-card-header">
+              <div className="dashboard-card-icon" style={{ background: 'rgba(59, 130, 246, 0.15)', color: '#3b82f6' }}>
+                <Users size={22} />
+              </div>
+              <div className="dashboard-card-label" style={{ color: '#93c5fd' }}>LABOR PAYMENTS</div>
+            </div>
+            <div>
+              <div className="dashboard-card-title">Total Paid to Labor</div>
+              <div className="dashboard-card-value" style={{ color: '#3b82f6' }}>
+                {formatCurrency(totalLaborPaid)}
+              </div>
+            </div>
+          </div>
+        </section>
+
         {/* BRICKS SUMMARY SECTION */}
         <section className="dashboard-bricks-card">
           <div className="dashboard-bricks-header">
@@ -307,6 +363,22 @@ export default async function DashboardPage() {
                 style={{ marginRight: 6, verticalAlign: 'text-bottom' }}
               />
               BRICKS SUMMARY
+            </div>
+          </div>
+
+          {/* Raw Bricks Produced Section */}
+          <div className="dashboard-bricks-section">
+            <div className="dashboard-bricks-section-header">
+              <Package2 size={20} />
+              <h3>Total Raw Bricks Produced</h3>
+            </div>
+            <div className="dashboard-bricks-main-stat">
+              <div className="dashboard-bricks-stat-value-large">
+                {totalRawBricks.toLocaleString('en-IN')}
+              </div>
+              <div className="dashboard-bricks-stat-note">
+                Total raw bricks made by labors
+              </div>
             </div>
           </div>
 

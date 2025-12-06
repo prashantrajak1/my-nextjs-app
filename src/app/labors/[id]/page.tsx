@@ -44,7 +44,7 @@ export default async function LaborDetailsPage({ params }: { params: Promise<{ i
                     </div>
 
                     {/* Horizontal Stats Bar */}
-                    <div className="glass-panel p-6 flex flex-wrap items-center justify-between gap-6">
+                    <div className="glass-panel p-6 w-full grid grid-cols-2 md:grid-cols-4 gap-6 items-center">
                         {/* Rate */}
                         <div className="flex flex-col">
                             <span className="text-sm text-blue-300 font-medium uppercase tracking-wider">Rate/Brick</span>
