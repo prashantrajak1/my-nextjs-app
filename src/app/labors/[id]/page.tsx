@@ -50,9 +50,11 @@ export default async function LaborDetailsPage({ params }: { params: Promise<{ i
                             <div className="text-2xl font-bold text-white">{labor.bricksMade.toLocaleString()}</div>
                         </div>
                         <div>
-                            <div className="text-sm text-gray-400">Current Due</div>
+                            <div className="text-sm text-gray-400">
+                                {labor.due >= 0 ? 'Current Advance (Due)' : 'Payable to Labor'}
+                            </div>
                             <div className={`text-2xl font-bold ${labor.due > 0 ? 'text-red-400' : 'text-green-400'}`}>
-                                ₹{labor.due.toLocaleString()}
+                                ₹{Math.abs(labor.due).toLocaleString()}
                             </div>
                         </div>
                     </div>

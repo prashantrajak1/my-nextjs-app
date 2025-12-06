@@ -321,8 +321,11 @@ export async function addLaborDailyRecord(formData: FormData) {
         });
 
         // 2. Update Labor Totals
+        // Advance Model: Due = Labor owes Company
+        // Payment increases Due (Advance given)
+        // Work decreases Due (Advance recovered)
         const workValue = bricksMade * brickRate;
-        const netDueChange = workValue - payment;
+        const netDueChange = payment - workValue;
 
         await tx.labor.update({
             where: { id: laborId },
@@ -372,7 +375,7 @@ export async function deleteLaborDailyRecord(formData: FormData) {
 
         // 2. Revert Labor Totals
         const workValue = record.bricksMade * record.brickRate;
-        const netDueChange = workValue - record.payment;
+        const netDueChange = record.payment - workValue;
 
         await tx.labor.update({
             where: { id: laborId },
