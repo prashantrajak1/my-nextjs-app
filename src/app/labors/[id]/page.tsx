@@ -23,6 +23,8 @@ export default async function LaborDetailsPage({ params }: { params: Promise<{ i
         redirect('/labors');
     }
 
+    const totalPaid = labor.dailyRecords.reduce((sum, record) => sum + record.payment, 0);
+
     return (
         <div className="container min-h-screen pb-10">
             <Navbar />
@@ -33,29 +35,42 @@ export default async function LaborDetailsPage({ params }: { params: Promise<{ i
                     Back to Labor List
                 </Link>
 
-                <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
+                <div className="flex flex-col gap-6">
                     <div>
                         <h1 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-accent">
                             {labor.name}
                         </h1>
-                        <p className="text-gray-400 mt-2 flex items-center gap-2">
-                            <span className="bg-white/10 px-2 py-1 rounded text-sm">{labor.address}</span>
-                            <span className="bg-white/10 px-2 py-1 rounded text-sm">Rate: ₹{labor.brickRate}</span>
-                        </p>
+                        <p className="text-gray-400 mt-1">{labor.address}</p>
                     </div>
 
-                    <div className="glass-panel p-4 flex gap-8">
-                        <div>
-                            <div className="text-sm text-gray-400">Total Bricks</div>
-                            <div className="text-2xl font-bold text-white">{labor.bricksMade.toLocaleString()}</div>
+                    {/* Horizontal Stats Bar */}
+                    <div className="glass-panel p-6 flex flex-wrap items-center justify-between gap-6">
+                        {/* Rate */}
+                        <div className="flex flex-col">
+                            <span className="text-sm text-blue-300 font-medium uppercase tracking-wider">Rate/Brick</span>
+                            <span className="text-2xl font-bold text-white">₹{labor.brickRate}</span>
                         </div>
-                        <div>
-                            <div className="text-sm text-gray-400">
-                                {labor.due >= 0 ? 'Current Advance (Due)' : 'Payable to Labor'}
-                            </div>
-                            <div className={`text-2xl font-bold ${labor.due > 0 ? 'text-red-400' : 'text-green-400'}`}>
+
+                        {/* Total Bricks */}
+                        <div className="flex flex-col">
+                            <span className="text-sm text-gray-400 font-medium uppercase tracking-wider">Total Bricks</span>
+                            <span className="text-2xl font-bold text-white">{labor.bricksMade.toLocaleString()}</span>
+                        </div>
+
+                        {/* Total Paid */}
+                        <div className="flex flex-col">
+                            <span className="text-sm text-yellow-400 font-medium uppercase tracking-wider">Total Paid</span>
+                            <span className="text-2xl font-bold text-yellow-400">₹{totalPaid.toLocaleString()}</span>
+                        </div>
+
+                        {/* Current Status */}
+                        <div className="flex flex-col">
+                            <span className="text-sm text-gray-400 font-medium uppercase tracking-wider">
+                                {labor.due >= 0 ? 'Current Advance' : 'Payable'}
+                            </span>
+                            <span className={`text-2xl font-bold ${labor.due > 0 ? 'text-red-400' : 'text-green-400'}`}>
                                 ₹{Math.abs(labor.due).toLocaleString()}
-                            </div>
+                            </span>
                         </div>
                     </div>
                 </div>
