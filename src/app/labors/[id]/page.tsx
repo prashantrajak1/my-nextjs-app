@@ -15,6 +15,9 @@ export default async function LaborDetailsPage({ params }: { params: Promise<{ i
         include: {
             dailyRecords: {
                 orderBy: { date: 'desc' }
+            },
+            payments: {
+                orderBy: { date: 'desc' }
             }
         }
     });
@@ -23,7 +26,21 @@ export default async function LaborDetailsPage({ params }: { params: Promise<{ i
         redirect('/labors');
     }
 
-    const totalPaid = labor.dailyRecords.reduce((sum, record) => sum + record.payment, 0);
+    const totalPaid = labor.dailyRecords.reduce((sum, record) => sum + record.payment, 0) +
+        labor.payments.reduce((sum, payment) => sum + payment.amount, 0);
+
+    const allRecords = [
+        ...labor.dailyRecords.map(r => ({ ...r, type: 'daily' })),
+        ...labor.payments.map(p => ({
+            id: p.id,
+            date: p.date,
+            bricksMade: 0,
+            brickRate: 0,
+            payment: p.amount,
+            isPaid: true,
+            type: 'payment'
+        }))
+    ].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
     return (
         <div className="container min-h-screen pb-10">
@@ -117,8 +134,8 @@ export default async function LaborDetailsPage({ params }: { params: Promise<{ i
 
                 {/* Daily Records List */}
                 <div className="lg:col-span-2 animate-fade-in" style={{ animationDelay: '0.2s' }}>
-                    <h2 className="text-xl font-bold mb-4">Daily Records</h2>
-                    <DailyRecordList records={labor.dailyRecords} laborId={labor.id} />
+                    <h2 className="text-xl font-bold mb-4">Daily Records & Advances</h2>
+                    <DailyRecordList records={allRecords} laborId={labor.id} />
                 </div>
             </div>
         </div>

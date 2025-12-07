@@ -66,7 +66,7 @@ export async function addLaborPayment(formData: FormData) {
         }),
         prisma.labor.update({
             where: { id: laborId },
-            data: { due: { decrement: amount } },
+            data: { due: { increment: amount } },
         }),
     ]);
 
@@ -106,6 +106,25 @@ export async function deleteLabor(formData: FormData) {
 
     revalidatePath('/labors');
     revalidatePath('/');
+}
+
+export async function deleteLaborPayment(formData: FormData) {
+    const id = formData.get('id') as string;
+    const laborId = formData.get('laborId') as string;
+
+    const payment = await prisma.laborPayment.findUnique({ where: { id } });
+    if (!payment) return;
+
+    await prisma.$transaction([
+        prisma.laborPayment.delete({ where: { id } }),
+        prisma.labor.update({
+            where: { id: laborId },
+            data: { due: { decrement: payment.amount } }, // Revert the increment
+        }),
+    ]);
+
+    revalidatePath(`/labors/${laborId}`);
+    revalidatePath('/labors');
 }
 
 // --- EXPENSE ACTIONS ---

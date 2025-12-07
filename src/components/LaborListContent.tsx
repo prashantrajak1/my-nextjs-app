@@ -2,9 +2,10 @@
 
 import Navbar from '@/components/Navbar';
 import { addLabor, deleteLabor } from '@/app/actions';
-import { UserPlus, MapPin, Download } from 'lucide-react';
+import { UserPlus, MapPin, Download, Plus } from 'lucide-react';
 import Link from 'next/link';
 import DeleteButton from '@/components/DeleteButton';
+import AddAdvanceModal from './AddAdvanceModal';
 import { useTranslation } from '@/context/TranslationContext';
 import { Labor } from '@prisma/client';
 import { useState, useMemo, useEffect } from 'react';
@@ -19,6 +20,13 @@ export default function LaborListContent({ labors }: LaborListContentProps) {
     const [startDate, setStartDate] = useState('');
     const [endDate, setEndDate] = useState('');
     const [expandedDates, setExpandedDates] = useState<string[]>([]);
+    const [isAdvanceModalOpen, setIsAdvanceModalOpen] = useState(false);
+    const [selectedLabor, setSelectedLabor] = useState<{ id: string, name: string } | null>(null);
+
+    const handleAddAdvance = (labor: Labor) => {
+        setSelectedLabor({ id: labor.id, name: labor.name });
+        setIsAdvanceModalOpen(true);
+    };
 
     // Filter labors based on date range (using createdAt)
     const filteredLabors = useMemo(() => {
@@ -190,6 +198,7 @@ export default function LaborListContent({ labors }: LaborListContentProps) {
                                                                 <th>{t('name')}</th>
                                                                 <th>{t('address')}</th>
                                                                 <th>{t('rate_per_brick')}</th>
+                                                                <th>{t('current_advance')}</th>
                                                                 <th>{t('actions')}</th>
                                                             </tr>
                                                         </thead>
@@ -204,8 +213,29 @@ export default function LaborListContent({ labors }: LaborListContentProps) {
                                                                         </div>
                                                                     </td>
                                                                     <td className="text-gray-300">₹{labor.brickRate.toFixed(2)}</td>
+                                                                    <td className="font-bold">
+                                                                        {labor.due > 0 ? (
+                                                                            <span className="text-red-400">
+                                                                                {t('advance')}: ₹{labor.due.toLocaleString()}
+                                                                            </span>
+                                                                        ) : labor.due < 0 ? (
+                                                                            <span className="text-green-400">
+                                                                                {t('pending')}: ₹{Math.abs(labor.due).toLocaleString()}
+                                                                            </span>
+                                                                        ) : (
+                                                                            <span className="text-gray-500">-</span>
+                                                                        )}
+                                                                    </td>
                                                                     <td>
                                                                         <div className="flex items-center gap-2">
+                                                                            <button
+                                                                                onClick={() => handleAddAdvance(labor)}
+                                                                                className="text-xs bg-yellow-500/20 text-yellow-400 px-3 py-1 rounded hover:bg-yellow-500/30 transition-colors font-medium flex items-center gap-1"
+                                                                                title={t('add_advance')}
+                                                                            >
+                                                                                <Plus size={12} />
+                                                                                {t('advance')}
+                                                                            </button>
                                                                             <Link href={`/labors/${labor.id}`}>
                                                                                 <button className="text-xs bg-purple-500/20 text-purple-400 px-3 py-1 rounded hover:bg-purple-500/30 transition-colors font-medium">
                                                                                     {t('view')}
@@ -233,6 +263,14 @@ export default function LaborListContent({ labors }: LaborListContentProps) {
                     )}
                 </div>
             </div>
+            {selectedLabor && (
+                <AddAdvanceModal
+                    isOpen={isAdvanceModalOpen}
+                    onClose={() => setIsAdvanceModalOpen(false)}
+                    laborId={selectedLabor.id}
+                    laborName={selectedLabor.name}
+                />
+            )}
         </div>
     );
 }

@@ -40,6 +40,9 @@ export const translations = {
         current_advance: "Current Advance",
         add_labor: "Add New Labor",
         phone: "Phone",
+        add_advance: "Add Advance",
+        advance: "Advance",
+        pending: "Pending",
 
         // Expenses
         expense_list: "Expense List",
@@ -119,6 +122,9 @@ export const translations = {
         current_advance: "हालको पेश्की",
         add_labor: "नयाँ मजदुर थप्नुहोस्",
         phone: "फोन",
+        add_advance: "पेश्की थप्नुहोस्",
+        advance: "पेश्की",
+        pending: "बाँकी",
 
         // Expenses
         expense_list: "खर्च सूची",
