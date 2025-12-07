@@ -2,13 +2,16 @@
 
 import { useTranslation } from '@/context/TranslationContext';
 import { useEffect, useState } from 'react';
+import { usePathname } from 'next/navigation';
 
 export default function TranslationPopup() {
     const { language, setLanguage, isLoaded } = useTranslation();
     const [isVisible, setIsVisible] = useState(false);
 
+    const pathname = usePathname();
+
     useEffect(() => {
-        if (isLoaded) {
+        if (isLoaded && pathname !== '/login') {
             // Check if language has been explicitly set in this session or previously
             // For this requirement, we want to show it on "login" (or first load)
             // We can check if a specific flag exists in sessionStorage to show it once per session
@@ -17,7 +20,7 @@ export default function TranslationPopup() {
                 setIsVisible(true);
             }
         }
-    }, [isLoaded]);
+    }, [isLoaded, pathname]);
 
     const handleSelect = (lang: 'en' | 'ne') => {
         setLanguage(lang);
