@@ -107,11 +107,6 @@ export default function LaborListContent({ labors }: LaborListContentProps) {
                                 />
                             </div>
                         </div>
-
-                        <a href={downloadUrl} className="glass-button flex items-center gap-2 bg-green-500/20 text-green-400 hover:bg-green-500/30 text-xs px-4 py-2 h-auto whitespace-nowrap ml-auto sm:ml-0">
-                            <Download size={14} />
-                            {t('download_csv')}
-                        </a>
                     </div>
                 </div>
             </header>
@@ -150,7 +145,13 @@ export default function LaborListContent({ labors }: LaborListContentProps) {
 
                 {/* Labor List */}
                 <div className="lg:col-span-2 space-y-4 animate-fade-in" style={{ animationDelay: '0.2s' }}>
-                    <h2 className="text-xl font-bold mb-4">{t('labor_list')}</h2>
+                    <div className="flex justify-between items-center mb-4">
+                        <h2 className="text-xl font-bold">{t('labor_list')}</h2>
+                        <a href={downloadUrl} className="glass-button flex items-center gap-2 bg-green-500/20 text-green-400 hover:bg-green-500/30 text-xs px-4 py-2 h-auto whitespace-nowrap">
+                            <Download size={14} />
+                            {t('download_csv')}
+                        </a>
+                    </div>
                     {sortedDates.length === 0 ? (
                         <div className="glass-panel p-8 text-center text-gray-400">
                             No laborers found for the selected period.
