@@ -4,7 +4,7 @@ export const dynamic = 'force-dynamic';
 import Navbar from '@/components/Navbar';
 import { prisma } from '@/lib/db';
 import { addExpense, deleteExpense } from '@/app/actions';
-import { PlusCircle, Calendar, Tag, Trash2, Edit, Download } from 'lucide-react';
+import { PlusCircle, Calendar, Tag, Download } from 'lucide-react';
 import { format } from 'date-fns';
 import Link from 'next/link';
 import DeleteButton from '@/components/DeleteButton';
@@ -101,12 +101,12 @@ export default async function ExpensesPage() {
                                             <td className="font-bold text-red-400">₹{expense.amount.toLocaleString()}</td>
                                             <td>
                                                 <div className="flex items-center gap-2">
-                                                    <Link href={`/expenses/${expense.id}/edit`} className="p-2 hover:bg-blue-500/20 text-blue-400 rounded-lg transition-colors">
-                                                        <Edit size={16} />
+                                                    <Link href={`/expenses/${expense.id}/edit`}>
+                                                        <button className="text-xs bg-blue-500/20 text-blue-400 px-3 py-1 rounded hover:bg-blue-500/30 transition-colors font-medium">
+                                                            Edit
+                                                        </button>
                                                     </Link>
-                                                    <form action={deleteExpense}>
-                                                        <DeleteButton id={expense.id} action={deleteExpense} label="" className="p-2 hover:bg-red-500/20 text-red-400 rounded-lg transition-colors" />
-                                                    </form>
+                                                    <DeleteButton id={expense.id} action={deleteExpense} label="Delete" className="text-xs bg-red-500/20 text-red-400 px-3 py-1 rounded hover:bg-red-500/30 transition-colors font-medium" />
                                                 </div>
                                             </td>
                                         </tr>

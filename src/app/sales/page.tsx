@@ -3,7 +3,7 @@ export const dynamic = 'force-dynamic';
 import Navbar from '@/components/Navbar';
 import { prisma } from '@/lib/db';
 import { addSale, deleteSale } from '@/app/actions';
-import { ShoppingCart, Calendar, Truck, FileText, Download, Trash2, Edit } from 'lucide-react';
+import { ShoppingCart, Calendar, Truck, FileText, Download } from 'lucide-react';
 import { format } from 'date-fns';
 import Link from 'next/link';
 import DeleteButton from '@/components/DeleteButton';
@@ -142,13 +142,11 @@ export default async function SalesPage() {
                                                 <td>
                                                     <div className="flex items-center gap-2">
                                                         <Link href={`/sales/${sale.id}/edit`}>
-                                                            <button className="text-xs bg-blue-500/20 text-blue-400 px-3 py-1 rounded hover:bg-blue-500/30 transition-colors">
-                                                                <Edit size={14} />
+                                                            <button className="text-xs bg-blue-500/20 text-blue-400 px-3 py-1 rounded hover:bg-blue-500/30 transition-colors font-medium">
+                                                                Edit
                                                             </button>
                                                         </Link>
-                                                        <form action={deleteSale}>
-                                                            <DeleteButton id={sale.id} action={deleteSale} label="" className="text-xs bg-red-500/20 text-red-400 px-3 py-1 rounded hover:bg-red-500/30 transition-colors" />
-                                                        </form>
+                                                        <DeleteButton id={sale.id} action={deleteSale} label="Delete" className="text-xs bg-red-500/20 text-red-400 px-3 py-1 rounded hover:bg-red-500/30 transition-colors font-medium" />
                                                     </div>
                                                 </td>
                                             </tr>
