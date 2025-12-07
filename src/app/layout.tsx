@@ -9,6 +9,11 @@ export const metadata: Metadata = {
   description: "Manufacturing Management System",
 };
 
+import { TranslationProvider } from "@/context/TranslationContext";
+import TranslationPopup from "@/components/TranslationPopup";
+
+// ... imports
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -16,7 +21,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={inter.className} suppressHydrationWarning>{children}</body>
+      <body className={inter.className} suppressHydrationWarning>
+        <TranslationProvider>
+          <TranslationPopup />
+          {children}
+        </TranslationProvider>
+      </body>
     </html>
   );
 }
