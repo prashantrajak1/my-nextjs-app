@@ -77,7 +77,7 @@ export default function SalesListContent({ sales }: SalesListContentProps) {
             <Navbar />
 
             <header className="mb-8 animate-fade-in container mx-auto px-4 pt-8">
-                <div className="flex flex-col md:flex-row justify-between items-end gap-4">
+                <div className="flex flex-col xl:flex-row justify-between items-start xl:items-end gap-6">
                     <div>
                         <h1 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-accent">
                             {t('sales_list')}
@@ -85,31 +85,31 @@ export default function SalesListContent({ sales }: SalesListContentProps) {
                         <p className="text-gray-400 mt-2">Record brick sales and payments.</p>
                     </div>
 
-                    <div className="flex flex-col sm:flex-row gap-4 items-end">
-                        <div className="flex gap-2 items-center bg-white/5 p-2 rounded-lg border border-white/10">
-                            <div className="flex flex-col">
+                    <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center w-full xl:w-auto">
+                        <div className="flex flex-wrap gap-2 items-center bg-white/5 p-2 rounded-lg border border-white/10">
+                            <div className="flex items-center gap-2">
                                 <label className="text-xs text-gray-400 ml-1">From</label>
                                 <input
                                     type="date"
                                     value={startDate}
                                     onChange={(e) => setStartDate(e.target.value)}
-                                    className="bg-transparent border-none text-white text-sm focus:ring-0 p-1"
+                                    className="bg-transparent border-none text-white text-sm focus:ring-0 p-1 w-32"
                                 />
                             </div>
                             <span className="text-gray-500">-</span>
-                            <div className="flex flex-col">
+                            <div className="flex items-center gap-2">
                                 <label className="text-xs text-gray-400 ml-1">To</label>
                                 <input
                                     type="date"
                                     value={endDate}
                                     onChange={(e) => setEndDate(e.target.value)}
-                                    className="bg-transparent border-none text-white text-sm focus:ring-0 p-1"
+                                    className="bg-transparent border-none text-white text-sm focus:ring-0 p-1 w-32"
                                 />
                             </div>
                         </div>
 
-                        <a href={downloadUrl} className="glass-button flex items-center gap-2 bg-green-500/20 text-green-400 hover:bg-green-500/30 h-[50px]">
-                            <Download size={16} />
+                        <a href={downloadUrl} className="glass-button flex items-center gap-2 bg-green-500/20 text-green-400 hover:bg-green-500/30 text-xs px-4 py-2 h-auto whitespace-nowrap ml-auto sm:ml-0">
+                            <Download size={14} />
                             {t('download_csv')}
                         </a>
                     </div>
