@@ -20,12 +20,17 @@ export default function DailyWorkList({ records, laborId }: { records: any[], la
                         <th>Date</th>
                         <th>Bricks</th>
                         <th>Work Value</th>
+                        <th>Payment</th>
+                        <th>Payable</th>
+                        <th>Balance</th>
                         <th>Action</th>
                     </tr>
                 </thead>
                 <tbody>
                     {records.map((record) => {
                         const workValue = record.bricksMade * record.brickRate;
+                        const payable = workValue - record.payment;
+
                         return (
                             <tr key={record.id}>
                                 <td className="text-gray-300">
@@ -36,6 +41,15 @@ export default function DailyWorkList({ records, laborId }: { records: any[], la
                                 </td>
                                 <td className="text-green-400">
                                     ₹{workValue.toLocaleString()}
+                                </td>
+                                <td className="text-yellow-400">
+                                    ₹{record.payment.toLocaleString()}
+                                </td>
+                                <td className="text-blue-400 font-bold">
+                                    ₹{payable.toLocaleString()}
+                                </td>
+                                <td className={`font-bold ${record.currentBalance > 0 ? 'text-green-400' : 'text-red-400'}`} style={{ color: record.currentBalance > 0 ? '#4ade80' : '#f87171' }}>
+                                    {record.currentBalance >= 0 ? `Adv: ₹${record.currentBalance.toLocaleString()}` : `Due: ₹${Math.abs(record.currentBalance).toLocaleString()}`}
                                 </td>
                                 <td>
                                     <form action={deleteLaborDailyRecord}>

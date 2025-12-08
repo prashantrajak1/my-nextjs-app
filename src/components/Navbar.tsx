@@ -32,38 +32,11 @@ export default function Navbar() {
     ];
 
     return (
-        <nav className="glass-panel mb-8 p-4 sticky top-4 z-50">
-            <div className="flex flex-col lg:flex-row justify-between items-center gap-4">
-                {/* Logo Section */}
-                <div className="flex items-center gap-3 w-full lg:w-auto justify-between">
-                    <div className="flex items-center gap-3">
-                        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary to-accent flex items-center justify-center font-bold text-white text-2xl shadow-lg border-2 border-white/10">
-                            SIU
-                        </div>
-                        <span className="font-bold text-2xl bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-                            संजय इट्टा उद्योग
-                        </span>
-                    </div>
+        <nav className="w-full mb-8 p-4 bg-gray-900/90 backdrop-blur-md sticky top-4 z-50 border-b border-white/10 shadow-2xl">
+            <div className="flex flex-col xl:flex-row items-center justify-between gap-4 w-full max-w-[1600px] mx-auto">
 
-                    {/* Mobile Controls (visible only on small screens) */}
-                    <div className="flex gap-2 lg:hidden">
-                        <button
-                            onClick={toggleLanguage}
-                            className="w-10 h-10 flex items-center justify-center rounded-lg border-2 border-white/10 bg-white/5 text-white hover:bg-white/10 transition-all"
-                        >
-                            {language === 'en' ? '🇳🇵' : '🇺🇸'}
-                        </button>
-                        <button
-                            onClick={handleLogout}
-                            className="w-10 h-10 flex items-center justify-center rounded-lg border-2 border-red-500/30 bg-red-500/10 text-red-400"
-                        >
-                            <LogOut size={20} />
-                        </button>
-                    </div>
-                </div>
-
-                {/* Navigation Items */}
-                <div className="flex flex-wrap justify-center gap-3 w-full lg:w-auto">
+                {/* 1. CENTER: Navigation Buttons */}
+                <div className="flex flex-wrap justify-center items-center gap-2 lg:gap-4 flex-1 w-full order-2 xl:order-1">
                     {navItems.map((item) => {
                         const Icon = item.icon;
                         const isActive = pathname === item.href;
@@ -72,37 +45,41 @@ export default function Navbar() {
                                 key={item.href}
                                 href={item.href}
                                 className={clsx(
-                                    'flex items-center gap-2 px-6 py-3 rounded-xl transition-all border-2 cursor-pointer font-bold text-sm sm:text-base',
-                                    isActive
-                                        ? 'bg-primary text-white border-primary shadow-lg shadow-primary/30 scale-105'
-                                        : 'bg-white/5 border-white/10 text-gray-400 hover:text-white hover:border-white/30 hover:bg-white/10 hover:scale-105'
+                                    'group flex flex-col justify-center items-center gap-1 px-4 py-2 min-h-[70px] min-w-[100px] transition-all duration-200 cursor-pointer border-2 hover:scale-105',
+                                    'rounded-md shadow-lg',
+                                    isActive ? 'border-gray-500 scale-105' : 'border-transparent hover:border-gray-600'
                                 )}
+                                style={{
+                                    backgroundColor: isActive ? '#374151' : '#1f2937',
+                                    color: 'white',
+                                    textTransform: 'uppercase',
+                                    fontWeight: '800',
+                                }}
                             >
-                                <Icon size={20} strokeWidth={2.5} />
-                                <span>{item.name}</span>
+                                <Icon size={22} strokeWidth={3} className={isActive ? 'text-white' : 'text-gray-400 group-hover:text-white'} />
+                                <span className="text-sm sm:text-base tracking-wider leading-none" style={{ fontFamily: 'sans-serif' }}>{item.name}</span>
                             </Link>
                         );
                     })}
                 </div>
 
-                {/* Desktop Controls */}
-                <div className="hidden lg:flex gap-3">
+                {/* 2. RIGHT: Controls (Visible Always) */}
+                <div className="flex items-center justify-center xl:justify-end gap-3 w-full xl:w-auto xl:ml-auto order-1 xl:order-2 mb-4 xl:mb-0">
                     <button
                         onClick={toggleLanguage}
-                        className="flex items-center gap-2 px-4 py-2 rounded-xl border-2 border-white/10 bg-white/5 text-white hover:bg-white/10 hover:border-white/30 transition-all font-bold"
+                        className="flex items-center justify-center w-14 h-14 bg-[#1f2937] hover:bg-[#374151] rounded-md border-2 border-transparent hover:border-gray-600 transition-all font-bold text-white shadow-lg"
                         title="Switch Language"
                     >
-                        <span className="text-xl">{language === 'en' ? '🇳🇵' : '🇺🇸'}</span>
-                        <span>{language === 'en' ? 'NE' : 'EN'}</span>
+                        <span className="text-lg">{language === 'en' ? 'NE' : 'EN'}</span>
                     </button>
 
                     <button
                         onClick={handleLogout}
-                        className="flex items-center gap-2 px-4 py-2 rounded-xl border-2 border-red-500/30 hover:border-red-500/50 hover:bg-red-500/10 text-gray-400 hover:text-red-400 transition-all cursor-pointer shadow-sm hover:shadow-lg hover:shadow-red-500/20 font-bold"
+                        className="flex items-center gap-2 px-5 h-14 bg-[#1f2937] hover:bg-red-900/30 rounded-md border-2 border-red-900/30 hover:border-red-500 text-red-400 hover:text-red-300 transition-all font-bold shadow-lg"
                         title={t('logout')}
                     >
-                        <LogOut size={20} strokeWidth={2.5} />
-                        <span>{t('logout')}</span>
+                        <LogOut size={22} strokeWidth={3} />
+                        <span className="text-lg">{t('logout').toUpperCase()}</span>
                     </button>
                 </div>
             </div>

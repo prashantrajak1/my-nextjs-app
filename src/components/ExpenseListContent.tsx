@@ -210,13 +210,30 @@ export default function ExpenseListContent({ expenses }: ExpenseListContentProps
                                                                     </td>
                                                                     <td className="font-bold text-red-400">₹{expense.amount.toLocaleString()}</td>
                                                                     <td>
-                                                                        <div className="flex items-center gap-2">
+                                                                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                                                                             <Link href={`/expenses/${expense.id}/edit`}>
-                                                                                <button className="text-xs bg-blue-500/20 text-blue-400 px-3 py-1 rounded hover:bg-blue-500/30 transition-colors font-medium">
+                                                                                <button
+                                                                                    className="text-xs font-bold uppercase tracking-wider transition-all hover:scale-105"
+                                                                                    style={{
+                                                                                        backgroundColor: 'rgba(59, 130, 246, 0.2)',
+                                                                                        color: '#93c5fd',
+                                                                                        border: '1px solid rgba(59, 130, 246, 0.3)',
+                                                                                        padding: '6px 14px',
+                                                                                        borderRadius: '8px',
+                                                                                        cursor: 'pointer'
+                                                                                    }}
+                                                                                >
                                                                                     {t('edit')}
                                                                                 </button>
                                                                             </Link>
-                                                                            <DeleteButton id={expense.id} action={deleteExpense} label={t('delete')} className="text-xs bg-red-500/20 text-red-400 px-3 py-1 rounded hover:bg-red-500/30 transition-colors font-medium" />
+                                                                            <div style={{ marginLeft: '4px' }}>
+                                                                                <DeleteButton
+                                                                                    id={expense.id}
+                                                                                    action={deleteExpense}
+                                                                                    label={t('delete')}
+                                                                                    className="text-xs font-bold uppercase tracking-wider transition-all hover:scale-105"
+                                                                                />
+                                                                            </div>
                                                                         </div>
                                                                     </td>
                                                                 </tr>

@@ -29,6 +29,8 @@ export const translations = {
         search: "Search...",
         download_csv: "Download CSV",
         actions: "Actions",
+        enter: "Enter",
+        csv: "CSV",
 
         // Labors
         labor_list: "Labor List",
@@ -43,6 +45,9 @@ export const translations = {
         add_advance: "Add Advance",
         advance: "Advance",
         pending: "Pending",
+        daily_work_records: "Daily Work Records",
+        advance_payments: "Advance Payments",
+        opening_balance: "Opening Balance",
 
         // Expenses
         expense_list: "Expense List",
@@ -111,6 +116,8 @@ export const translations = {
         search: "खोज्नुहोस्...",
         download_csv: "CSV डाउनलोड",
         actions: "कार्यहरू",
+        enter: "विवरण",
+        csv: "CSV",
 
         // Labors
         labor_list: "मजदुर सूची",
@@ -125,6 +132,9 @@ export const translations = {
         add_advance: "पेश्की थप्नुहोस्",
         advance: "पेश्की",
         pending: "बाँकी",
+        daily_work_records: "दैनिक कामको रेकर्ड",
+        advance_payments: "पेश्की भुक्तानीहरू",
+        opening_balance: "सुरुको मौज्दात",
 
         // Expenses
         expense_list: "खर्च सूची",
