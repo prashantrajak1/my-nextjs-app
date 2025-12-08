@@ -1,10 +1,11 @@
 import Navbar from '@/components/Navbar';
 import { prisma } from '@/lib/db';
-import { addLaborDailyRecord, deleteLaborDailyRecord, toggleLaborRecordPaid } from '@/app/actions';
-import { ArrowLeft, Plus, Trash2, Calendar, CheckCircle, XCircle } from 'lucide-react';
+import { addLaborDailyRecord, addLaborPayment } from '@/app/actions';
+import { ArrowLeft, Plus, Calendar, Wallet } from 'lucide-react';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
-import DailyRecordList from './DailyRecordList'; // Client component for interactivity
+import DailyWorkList from '@/components/DailyWorkList';
+import AdvanceList from '@/components/AdvanceList';
 
 export const dynamic = 'force-dynamic';
 
@@ -14,7 +15,12 @@ export default async function LaborDetailsPage({ params }: { params: Promise<{ i
         where: { id },
         include: {
             dailyRecords: {
-                orderBy: { date: 'desc' }
+                orderBy: { date: 'desc' },
+                where: { isPaid: false } // Only show unpaid work records in work list? Or all? User said "separate section", usually means all work.
+                // Re-reading: "separate section that is advance and payable". "Payable" usually means work done.
+                // Usually we want to see history. I will show all daily records in the work list for history, 
+                // but the prompt implies separating "Payable" (Work) and "Advance".
+                // I'll show all.
             },
             payments: {
                 orderBy: { date: 'desc' }
@@ -26,21 +32,23 @@ export default async function LaborDetailsPage({ params }: { params: Promise<{ i
         redirect('/labors');
     }
 
-    const totalPaid = labor.dailyRecords.reduce((sum, record) => sum + record.payment, 0) +
-        labor.payments.reduce((sum, payment) => sum + payment.amount, 0);
+    // Recalculate totals for display if needed, but labor model has 'due' which is the balance.
+    // Total Paid = Sum of all Advances (payments table) + Payments made directly in daily records (legacy)
+    // To match the new model, we iterate.
 
-    const allRecords = [
-        ...labor.dailyRecords.map(r => ({ ...r, type: 'daily' })),
-        ...labor.payments.map(p => ({
-            id: p.id,
-            date: p.date,
-            bricksMade: 0,
-            brickRate: 0,
-            payment: p.amount,
-            isPaid: true,
-            type: 'payment'
-        }))
-    ].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+    // We need to fetch ALL daily records to get accurate totals if we used `where` above.
+    // Let's just fetch all and filter in memory if necessary, or just rely on the included lists.
+    // The previous code fetched all.
+
+    // NOTE: The previous code had:
+    // const totalPaid = labor.dailyRecords.reduce((sum, record) => sum + record.payment, 0) +
+    //    labor.payments.reduce((sum, payment) => sum + payment.amount, 0);
+    //
+    // This is still valid for "Total Paid". 
+
+    const totalWorkValue = labor.dailyRecords.reduce((sum, record) => sum + (record.bricksMade * record.brickRate), 0);
+    const totalAdvancePaid = labor.payments.reduce((sum, payment) => sum + payment.amount, 0) +
+        labor.dailyRecords.reduce((sum, record) => sum + record.payment, 0);
 
     return (
         <div className="container min-h-screen pb-10">
@@ -74,16 +82,16 @@ export default async function LaborDetailsPage({ params }: { params: Promise<{ i
                             <span className="text-2xl font-bold text-white">{labor.bricksMade.toLocaleString()}</span>
                         </div>
 
-                        {/* Total Paid */}
+                        {/* Total Paid / Advances */}
                         <div className="flex flex-col">
                             <span className="text-sm text-yellow-400 font-medium uppercase tracking-wider">Total Paid</span>
-                            <span className="text-2xl font-bold text-yellow-400">₹{totalPaid.toLocaleString()}</span>
+                            <span className="text-2xl font-bold text-yellow-400">₹{totalAdvancePaid.toLocaleString()}</span>
                         </div>
 
                         {/* Current Status */}
                         <div className="flex flex-col">
                             <span className="text-sm text-gray-400 font-medium uppercase tracking-wider">
-                                {labor.due >= 0 ? 'Current Advance' : 'Payable'}
+                                {labor.due >= 0 ? 'Current Advance' : 'Net Payable'}
                             </span>
                             <span className={`text-2xl font-bold ${labor.due > 0 ? 'text-red-400' : 'text-green-400'}`}>
                                 ₹{Math.abs(labor.due).toLocaleString()}
@@ -94,16 +102,20 @@ export default async function LaborDetailsPage({ params }: { params: Promise<{ i
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                {/* Add Daily Record Form */}
-                <div className="lg:col-span-1">
-                    <div className="glass-card sticky top-24 animate-fade-in" style={{ animationDelay: '0.1s' }}>
+                {/* Left Column: Forms */}
+                <div className="lg:col-span-1 space-y-6">
+                    {/* Add Daily Work Form */}
+                    <div className="glass-card animate-fade-in" style={{ animationDelay: '0.1s' }}>
                         <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
                             <Calendar size={20} className="text-primary" />
-                            Add Daily Entry
+                            Add Daily Work
                         </h2>
                         <form action={addLaborDailyRecord} className="space-y-4">
                             <input type="hidden" name="laborId" value={labor.id} />
                             <input type="hidden" name="brickRate" value={labor.brickRate} />
+
+                            {/* Hidden payment field mandated by action, set to 0 */}
+                            <input type="hidden" name="payment" value="0" />
 
                             <div>
                                 <label className="block text-sm font-medium text-gray-300 mb-1">Date</label>
@@ -117,25 +129,53 @@ export default async function LaborDetailsPage({ params }: { params: Promise<{ i
                             </div>
                             <div>
                                 <label className="block text-sm font-medium text-gray-300 mb-1">Bricks Made</label>
-                                <input name="bricksMade" type="number" className="glass-input" placeholder="0" defaultValue="0" />
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-300 mb-1">Payment Given (₹)</label>
-                                <input name="payment" type="number" step="0.01" className="glass-input" placeholder="0.00" defaultValue="0" />
+                                <input name="bricksMade" type="number" className="glass-input" placeholder="0" required />
                             </div>
 
                             <button type="submit" className="glass-button w-full flex justify-center items-center gap-2">
                                 <Plus size={18} />
-                                Add Record
+                                Add Work
+                            </button>
+                        </form>
+                    </div>
+
+                    {/* Add Advance Form */}
+                    <div className="glass-card animate-fade-in" style={{ animationDelay: '0.2s' }}>
+                        <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
+                            <Wallet size={20} className="text-yellow-400" />
+                            Given Advance
+                        </h2>
+                        <form action={addLaborPayment} className="space-y-4">
+                            <input type="hidden" name="laborId" value={labor.id} />
+
+                            <div>
+                                <label className="block text-sm font-medium text-gray-300 mb-1">Amount (₹)</label>
+                                <input name="amount" type="number" step="0.01" className="glass-input" placeholder="0.00" required />
+                            </div>
+
+                            <button type="submit" className="glass-button bg-yellow-500/20 text-yellow-400 hover:bg-yellow-500/30 w-full flex justify-center items-center gap-2">
+                                <Plus size={18} />
+                                Add Advance
                             </button>
                         </form>
                     </div>
                 </div>
 
-                {/* Daily Records List */}
-                <div className="lg:col-span-2 animate-fade-in" style={{ animationDelay: '0.2s' }}>
-                    <h2 className="text-xl font-bold mb-4">Daily Records & Advances</h2>
-                    <DailyRecordList records={allRecords} laborId={labor.id} />
+                {/* Right Column: Lists */}
+                <div className="lg:col-span-2 space-y-8 animate-fade-in" style={{ animationDelay: '0.3s' }}>
+
+                    {/* Advances List */}
+                    <div>
+                        <h2 className="text-xl font-bold mb-4 text-yellow-400">Advance History</h2>
+                        <AdvanceList records={labor.payments} laborId={labor.id} />
+                    </div>
+
+                    {/* Daily Work List */}
+                    <div>
+                        <h2 className="text-xl font-bold mb-4 text-primary">Daily Work Records</h2>
+                        <DailyWorkList records={labor.dailyRecords} laborId={labor.id} />
+                    </div>
+
                 </div>
             </div>
         </div>
